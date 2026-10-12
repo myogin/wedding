@@ -1,0 +1,170 @@
+:root {
+  --sc-font-display: var(--font-display), "Bodoni Moda", Georgia, serif;
+  --sc-font-text: var(--font-teks), "Poppins", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--sc-canvas);
+  color: var(--sc-ink);
+  font-family: var(--sc-font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layar loading */
+.layar-loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  background: var(--sc-canvas);
+}
+
+.layar-loading__mempelai {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: clamp(1.75rem, 6vw, 2.75rem);
+}
+
+.layar-loading__teks {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.8125rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Sampul */
+.sampul {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sampul__foto {
+  object-fit: cover;
+  object-position: center 30%;
+  z-index: -2;
+}
+
+/* Scrim hanya di area teks, bukan menutup seluruh foto. */
+.sampul::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--sc-canvas) 88%, transparent) 55%);
+}
+
+.sampul__isi {
+  width: 100%;
+  max-width: 34rem;
+  padding: 0 1.5rem max(2.5rem, env(safe-area-inset-bottom));
+}
+
+.sampul__judul {
+  margin: 0 0 0.5rem;
+  color: var(--sc-ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.sampul__mempelai {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 11vw, 4.5rem);
+  line-height: 1.02;
+}
+
+.sampul__tanggal {
+  margin: 0.75rem 0 0;
+  color: var(--sc-accent);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+}
+
+.sampul__tamu {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--sc-ink) 22%, transparent);
+}
+
+.sampul__kepada {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.8125rem;
+}
+
+.sampul__nama-tamu {
+  margin: 0.25rem 0 0;
+  font-family: var(--sc-font-display);
+  font-size: 1.5rem;
+  overflow-wrap: anywhere;
+}
+
+.sampul__maaf {
+  margin: 0.75rem 0 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.sampul__buka {
+  margin-top: 1.75rem;
+  min-height: 3rem;
+  padding: 0 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+  font: 500 0.9375rem/1 var(--sc-font-text);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.sampul__buka:hover {
+  transform: translateY(-1px);
+}
+
+.sampul__buka:focus-visible {
+  outline: 2px solid var(--sc-ink);
+  outline-offset: 3px;
+}
+
+@media (min-width: 900px) {
+  .sampul {
+    align-items: center;
+  }
+
+  .sampul__foto {
+    object-position: center 45%;
+  }
+
+  /* Di layar lebar teks ada di kolom kiri, jadi scrim pindah ke samping dan wajah Mempelai tetap terang. */
+  .sampul::after {
+    inset: 0 auto 0 0;
+    width: min(62%, 52rem);
+    background: linear-gradient(to right, color-mix(in srgb, var(--sc-canvas) 86%, transparent) 55%, transparent);
+  }
+
+  .sampul__isi {
+    max-width: 40rem;
+    padding-left: clamp(2rem, 7vw, 6rem);
+    padding-bottom: 4rem;
+  }
+}

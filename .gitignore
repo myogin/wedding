@@ -23,3 +23,8 @@ playwright/.cache/
 # misc
 .DS_Store
 *.tsbuildinfo
+
+# scroll-craft: keluaran inspeksi sementara (dua lembar bukti tetap di-commit)
+scrollcraft/builds/*/lab/*
+!scrollcraft/builds/*/lab/lembar-lapisan.jpg
+!scrollcraft/builds/*/lab/simulasi-hero.jpg

@@ -14,3 +14,4 @@ blob-report
 *.md
 Dockerfile
 compose.yaml
+scrollcraft

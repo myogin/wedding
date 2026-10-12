@@ -35,12 +35,13 @@ export const kontenMentah = {
     placeholder: true,
     judul: "Pernikahan",
     catatanMaaf: "Kami mohon maaf apabila ada kesalahan penulisan nama atau gelar.",
-    foto: {
-      src: "/placeholder/sampul.jpg",
-      alt: "Agung Dalem dan Ayu Oka",
-      lebar: 1400,
-      tinggi: 2100,
-    },
+  },
+
+  // Dipotong dari /placeholder/sampul.jpg. Ganti fotonya, lalu bangun ulang lapisannya.
+  hero: {
+    placeholder: true,
+    folder: "/placeholder/hero",
+    alt: "Agung Dalem dan Ayu Oka berdiri di lorong villa berlentera",
   },
 
   pembuka: {
@@ -117,14 +118,15 @@ export const kontenMentah = {
 
   tema: {
     placeholder: true,
-    font: { display: "bodoni-moda", teks: "poppins" },
+    // Palet "api lentera" dari RENCANA.md §6. Kontras terukur: ink 16.3:1, inkSoft 8.6:1, accent 9.4:1.
+    font: { display: "bodoni-moda", teks: "jost" },
     warna: {
-      canvas: "#0F0D0B",
-      surface: "#1A1613",
-      ink: "#F3ECE2",
-      inkSoft: "#B7AA9A",
-      accent: "#C8A46A",
-      accentInk: "#1A1410",
+      canvas: "#0E0B09",
+      surface: "#18120E",
+      ink: "#F2E9DD",
+      inkSoft: "#BBA990",
+      accent: "#E3A857",
+      accentInk: "#1B1208",
     },
   },
 

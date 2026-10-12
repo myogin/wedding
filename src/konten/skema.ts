@@ -66,7 +66,18 @@ export const skemaKontenUndangan = z
       ...penandaPlaceholder,
       judul: z.string().min(1),
       catatanMaaf: z.string().min(1),
-      foto: skemaGambar,
+    }),
+    /**
+     * Lapisan Hero yang dipotong dari satu foto: latar, subjek, depan (masing-masing terang dan gelap),
+     * poster, dan hero.json. Isi folder dibuat oleh alat di scrollcraft/builds/undangan (RENCANA.md §8).
+     * Sampul memakai keadaan gelap dari lapisan yang sama.
+     */
+    hero: z.object({
+      ...penandaPlaceholder,
+      folder: z
+        .string()
+        .regex(/^\/[^\s]*[^/]$/, "folder harus diawali / (relatif ke folder public) dan tanpa / di akhir"),
+      alt: z.string().min(1),
     }),
     pembuka: z.object({
       ...penandaPlaceholder,

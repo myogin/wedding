@@ -128,17 +128,20 @@ function isiPushPull(rgb, w, h, lubang) {
 }
 
 /**
- * Lentera padam: kecerahan turun tajam dan sorotan lentera ditekan lebih kuat.
- * Sorotan yang padam diberi warna kayu gelap yang hangat; kalau warnanya dibiarkan, inti lentera
- * yang hampir putih berubah menjadi bintik kebiruan di tengah ruangan yang jingga.
+ * Lentera padam: seluruh ruangan meredup dengan kurva yang tetap monoton, dan sorotan ditekan paling kuat
+ * sehingga inti lentera hanya sedikit lebih terang dari dinding di sekitarnya.
+ * Kurva yang tidak monoton membuat inti lentera lebih gelap dari dinding (noda gelap), dan sorotan yang
+ * dibiarkan putih berubah kebiruan di ruangan yang jingga. Karena itu sorotan diberi rona jingga ruangan.
  */
+const RONA_RUANGAN = [1, 0.67, 0.35]; // jingga dinding berlentera; luminansnya ±0.717
 function gelapkan(rgb, kanal) {
   const hasil = Buffer.from(rgb);
+  const lumRona = luminans(RONA_RUANGAN[0] * 255, RONA_RUANGAN[1] * 255, RONA_RUANGAN[2] * 255);
   for (let i = 0; i < rgb.length; i += kanal) {
     const L = luminans(rgb[i], rgb[i + 1], rgb[i + 2]);
-    const f = 0.22 * (1 - 0.6 * smoothstep(0.45, 1, L));
-    const sorot = smoothstep(0.35, 0.9, L);
-    const hangat = [L * 255 * f, L * 255 * f * 0.74, L * 255 * f * 0.55];
+    const f = 0.2 * (1 - 0.4 * smoothstep(0.5, 1, L));
+    const sorot = smoothstep(0.45, 0.85, L);
+    const hangat = RONA_RUANGAN.map((c) => ((c * L * f) / lumRona) * 255);
     for (let k = 0; k < 3; k++) hasil[i + k] = Math.round(rgb[i + k] * f * (1 - sorot) + hangat[k] * sorot);
   }
   return hasil;

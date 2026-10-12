@@ -137,7 +137,7 @@ Semua lapisan berada di **ruang bingkai foto 1400×2100** dan diskalakan dari **
 | Atmosfer belakang | Pendar CSS di koordinat `hero.json` → `lentera` (radial, `mix-blend-mode: screen`) | `opacity` 0→1 saat penyalaan, kedip pelan ±3% (mati di reduced motion) | Ikut skala latar |
 | Teks | `<h1>` nama Mempelai | Stabil (1x) | Desktop: di kolom gelap kiri, tanpa scrim. Ponsel: pita bawah dengan scrim pita. Nama utuh selalu terbaca. |
 | Subjek | `subjek.webp` / `subjek-gelap.webp`, alpha asli dari Apple Vision | Skala 1.03→1.16 (ponsel), 1.03→1.33 (desktop) | Titik kontak kaki = titik asal transform |
-| Depan dekat | `depan-sedap-malam.webp` / `-gelap`, blur dan gelap (di luar cahaya) | Turun 0→50% (ponsel) / 55% (desktop) tinggi viewport, skala 1→1.25, keluar layar sebelum p=1 | Hanya di sudut kanan bawah. Tidak pernah menutupi `<h1>` atau tombol. |
+| Depan dekat | `depan-sedap-malam.webp` / `-gelap`, blur dan gelap (di luar cahaya) | Lebar 56% (ponsel) / 40% (desktop) lebar viewport. Turun 0→50% (ponsel) / 55% (desktop) tinggi viewport, skala 1→1.25, keluar layar sebelum p=1 | Hanya di sudut kanan bawah. Tidak pernah menutupi `<h1>` atau tombol. Di ponsel berada di atas scrim pita teks, di luar kolom teks (tiket 04: pada 78% buket tenggelam di scrim). Tepi kiri potongannya dipudarkan di CSS karena buket terpotong di tepi itu. |
 | Atmosfer depan | Kabut hangat dan debu (CSS, tanpa aset) | Melayang pelan, berhenti saat di luar layar | Tidak memucatkan foto |
 
 - **Desktop = jendela cahaya.** Bingkai setinggi 1.12× viewport, pusatnya di 62% lebar, tepinya memudar ke canvas dengan `mask-image`: 20% di kiri dan kanan, 12% di atas dan bawah. Hasilnya lorong terang di ruangan gelap, dengan kolom kiri yang gelap untuk nama.
@@ -147,7 +147,7 @@ Semua lapisan berada di **ruang bingkai foto 1400×2100** dan diskalakan dari **
   - Ketukan "Buka Undangan": latar dan subjek gelap memudar ke versi terang selama ±1,2 s dan pendar lentera menyala bergiliran.
   - p 0→1: kamera "melangkah masuk", sedap malam lewat dan keluar, nama tetap di tempatnya.
   - Keluar: lepas pin ke Restu yang hampir hitam.
-- **Keadaan statis (reduced motion / JS mati)**: poster terang di posisi p=0, tetap berlapis (latar, subjek, dan sedap malam diam di posisi p=0), tanpa ruang pin tambahan.
+- **Keadaan statis (reduced motion)**: lapisan terang di posisi p=0, tetap berlapis (latar, subjek, dan sedap malam diam di posisi p=0), tanpa ruang pin tambahan. Tanpa JavaScript, Undangan tidak dibuka sama sekali: layar loading menampilkan pesan untuk mengaktifkan JavaScript (keputusan tiket 01), karena Sampul personal dan RSVP butuh JavaScript.
 - **Poster** (`poster.webp`, `poster-gelap.webp`): komposit latar dan subjek di ruang bingkai yang sama. Diposisikan dengan rumus yang sama seperti lapisan, sehingga tidak ada lompatan saat lapisan selesai dimuat. Semua lapisan dimuat bersamaan sebelum poster diganti.
 
 Bukti visual (dihasilkan alat, tidak di-commit kecuali dua lembar ini):

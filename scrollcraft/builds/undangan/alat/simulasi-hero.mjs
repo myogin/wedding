@@ -12,7 +12,7 @@ const B = hero.bingkai;
 
 /** Angka koreografi, sama dengan yang dicatat di RENCANA.md. */
 export const KOREOGRAFI = {
-  ponsel: { skalaLatar: [1, 1.1], skalaSubjek: [1.03, 1.16], lebarDepan: 0.78, turunDepan: 0.5 },
+  ponsel: { skalaLatar: [1, 1.1], skalaSubjek: [1.03, 1.16], lebarDepan: 0.56, turunDepan: 0.5 },
   desktop: { tinggiJendela: 1.12, pusatX: 0.62, skalaLatar: [1, 1.25], skalaSubjek: [1.03, 1.33], lebarDepan: 0.4, turunDepan: 0.55 },
 };
 

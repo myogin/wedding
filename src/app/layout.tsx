@@ -11,7 +11,10 @@ export const metadata: Metadata = {
 
 const { warna, font } = kontenUndangan.tema;
 
+// Inline di <html>, jadi menang atas nilai bawaan :root di stylesheet mana pun (termasuk engine scroll-craft).
 const tokenTema = {
+  "--sc-font-display": 'var(--font-display), "Bodoni Moda", Georgia, serif',
+  "--sc-font-text": "var(--font-teks), system-ui, sans-serif",
   "--sc-canvas": warna.canvas,
   "--sc-surface": warna.surface,
   "--sc-ink": warna.ink,

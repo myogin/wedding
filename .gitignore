@@ -28,3 +28,4 @@ playwright/.cache/
 scrollcraft/builds/*/lab/*
 !scrollcraft/builds/*/lab/lembar-lapisan.jpg
 !scrollcraft/builds/*/lab/simulasi-hero.jpg
+!scrollcraft/builds/*/lab/verifikasi-*.jpg

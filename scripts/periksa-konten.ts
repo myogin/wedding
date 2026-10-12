@@ -1,4 +1,6 @@
-// Dijalankan sebelum `next build`: memvalidasi Konten Undangan dan mencetak Placeholder yang masih aktif.
+// Dijalankan sebelum `next build`: memvalidasi Konten Undangan beserta lapisan Hero-nya,
+// lalu mencetak Placeholder yang masih aktif.
+import { muatHero } from "@/konten/hero";
 import { daftarPlaceholder } from "@/konten/placeholder";
 import { kontenMentah } from "@/konten/undangan";
 import { parseKontenUndangan } from "@/konten/parse";
@@ -6,6 +8,7 @@ import { parseKontenUndangan } from "@/konten/parse";
 let konten;
 try {
   konten = parseKontenUndangan(kontenMentah);
+  muatHero(konten.hero.folder);
 } catch (error) {
   console.error(`\n✖ ${(error as Error).message}\n`);
   process.exit(1);

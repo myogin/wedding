@@ -1,0 +1,660 @@
+/* Halaman Undangan. Dimuat setelah scrollcraft.css; engine tidak diubah, hanya markup milik halaman yang ditata.
+   Rencana visual: scrollcraft/builds/undangan/RENCANA.md (§6 palet dan tipografi, §7 kontrak lapisan Hero). */
+
+/* Tepi kiri teks di layar lebar, dipakai bersama oleh Sampul, Hero, dan kaki. */
+html {
+  --tepi-lebar: clamp(1.5rem, 6vw, 6.5rem);
+}
+
+/* Isi Undangan terkunci sampai "Buka Undangan" ditekan. */
+html:has(.undangan:not([data-terbuka])) {
+  overflow: hidden;
+}
+
+/* Tanggal kecil berhuruf kapital yang dipakai di bawah nama Mempelai. */
+.label-tanggal {
+  color: var(--sc-ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.undangan {
+  position: relative;
+}
+
+/* ------------------------------------------------------------------ gerbang -- */
+/* Layar loading dan Sampul melayang di atas segalanya, termasuk grain dan tombol musik. */
+.gerbang {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+
+.layar-loading {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--sc-canvas);
+}
+
+.layar-loading__mempelai {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: clamp(1.75rem, 6vw, 2.75rem);
+  letter-spacing: -0.01em;
+}
+
+.layar-loading__progres {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  width: min(15rem, 70vw);
+}
+
+.layar-loading__teks {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.6875rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.layar-loading__angka {
+  color: var(--sc-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.layar-loading__garis {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: var(--sc-hairline);
+}
+
+.layar-loading__garis::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sc-accent);
+  transform: scaleX(var(--persen, 0));
+  transform-origin: left;
+  transition: transform 420ms var(--sc-ease-out);
+}
+
+/* Sampul: tanpa latar sendiri. Yang terlihat di belakangnya adalah Hero dalam keadaan padam.
+   Bila isinya lebih tinggi dari layar (ponsel mendatar), Sampul bisa di-scroll sendiri sampai tombolnya. */
+.sampul {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: muncul 900ms var(--sc-ease-out) both;
+  transition: opacity 700ms var(--sc-ease-out);
+}
+
+.sampul[data-keluar] {
+  opacity: 0;
+}
+
+/* Pita gelap di bawah teks, saudara dari blok teks (bukan anaknya). */
+.sampul::before {
+  content: "";
+  position: absolute;
+  inset: 28% 0 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--sc-canvas) 94%, transparent) 0%,
+    color-mix(in oklab, var(--sc-canvas) 70%, transparent) 45%,
+    transparent
+  );
+}
+
+/* Margin otomatis, bukan align-items: saat isinya meluap, margin menjadi nol dan bagian atasnya tetap terjangkau. */
+.sampul__isi {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  margin-top: auto;
+  padding: 0 1.5rem max(2.75rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+}
+
+.sampul__judul {
+  margin: 0 0 0.75rem;
+  color: var(--sc-ink-soft);
+  font-size: 0.6875rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.sampul__mempelai {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, min(11vw, 7.5vh), 4.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.sampul__tanggal {
+  margin: 0.875rem 0 0;
+  color: var(--sc-accent);
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sampul__tamu {
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--sc-hairline-strong);
+}
+
+.sampul__kepada {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.8125rem;
+}
+
+.sampul__nama-tamu {
+  margin: 0.25rem 0 0;
+  font-family: var(--sc-font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.sampul__maaf {
+  margin: 0.75rem 0 0;
+  max-width: 40ch;
+  color: var(--sc-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.sampul__buka {
+  margin-top: 1.75rem;
+  min-height: 3rem;
+  padding: 0 1.75rem;
+  border: 0;
+  border-radius: var(--sc-r-pill);
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+  font: 500 0.875rem/1 var(--sc-font-text);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 140ms var(--sc-ease-out);
+}
+
+.sampul__buka:active {
+  transform: scale(0.97);
+}
+
+.sampul__buka:focus-visible {
+  outline: 2px solid var(--sc-ink);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sampul__buka:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* --------------------------------------------------------------------- hero -- */
+/* Koreografi (RENCANA.md §7, sama dengan KOREOGRAFI di alat/simulasi-hero.mjs).
+   p adalah progres act dari engine; skala latar dan subjek berbeda laju, sedap malam turun keluar layar. */
+.hero {
+  --p: var(--sc-p, 0);
+  --skala-latar: calc(1 + 0.1 * var(--p));
+  --skala-subjek: calc(1.03 + 0.13 * var(--p));
+}
+
+.hero__panggung {
+  background: var(--sc-canvas);
+}
+
+/* Ruang ukur lapisan: satuan cqw/cqh di bawah ini relatif ke panggung, bukan ke halaman. */
+.hero__ruang {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  container-type: size;
+}
+
+.hero__adegan {
+  position: absolute;
+  inset: 0;
+}
+
+/* Ponsel: bingkai di-cover ke layar, digeser ke titik fokus. */
+.hero__bingkai {
+  --lebar-bingkai: max(100cqw, 100cqh / var(--rasio-bingkai));
+  position: absolute;
+  width: var(--lebar-bingkai);
+  height: calc(var(--lebar-bingkai) * var(--rasio-bingkai));
+  left: clamp(100cqw - var(--lebar-bingkai), 50cqw - var(--fokus-x) * var(--lebar-bingkai), 0px);
+  top: calc((100cqh - var(--lebar-bingkai) * var(--rasio-bingkai)) / 2);
+}
+
+.hero__poster,
+.hero__jauh {
+  position: absolute;
+  inset: 0;
+  transform: scale(var(--skala-latar));
+  transform-origin: var(--kontak-x) var(--kontak-y);
+}
+
+.hero__subjek {
+  position: absolute;
+  transform: scale(var(--skala-subjek));
+}
+
+.hero__bingkai img,
+.hero__depan img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+/* Sedap malam di sudut kanan bawah, paling dekat ke kamera. Berlabuh di titik (82%, 34%) miliknya.
+   Di ponsel lebarnya 56% layar supaya tetap di luar pita teks. */
+.hero__depan {
+  --lebar: 56cqw;
+  --turun: 50cqh;
+  position: absolute;
+  width: var(--lebar);
+  height: calc(var(--lebar) * var(--rasio-depan));
+  left: calc(100cqw - 0.82 * var(--lebar));
+  top: calc(100cqh - 0.34 * var(--lebar) * var(--rasio-depan));
+  transform: translateY(calc(var(--p) * var(--turun))) scale(calc(1 + 0.25 * var(--p)));
+  transform-origin: 82% 34%;
+  pointer-events: none;
+}
+
+/* Buket terpotong di tepi kiri potongan fotonya; tepi itu dipudarkan agar tidak tampak garis lurus. */
+.hero__depan img {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%);
+  mask-image: linear-gradient(to right, transparent, #000 14%);
+}
+
+/* Lapisan hanya dipakai bila semuanya termuat; selain itu poster yang tampil. */
+.undangan:not([data-hero="lapisan"]) :is(.hero__jauh, .hero__subjek, .hero__depan) {
+  visibility: hidden;
+}
+
+.undangan[data-hero="lapisan"] .hero__poster {
+  visibility: hidden;
+}
+
+/* Penyalaan: versi terang memudar masuk di atas versi gelap. */
+.hero__terang {
+  opacity: 0;
+  transition: opacity 1400ms var(--sc-ease-out) 450ms;
+}
+
+.undangan[data-terbuka] .hero__terang {
+  opacity: 1;
+}
+
+/* Pendar lentera menyala satu per satu, lalu berkedip pelan. */
+.hero__pendar {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 194 122 / 0.55),
+    rgb(227 168 87 / 0.18) 45%,
+    rgb(227 168 87 / 0)
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.82);
+  transition:
+    opacity 700ms var(--sc-ease-out),
+    transform 900ms var(--sc-ease-out);
+  transition-delay: calc(180ms + var(--urutan) * 230ms);
+}
+
+.undangan[data-terbuka] .hero__pendar {
+  opacity: 1;
+  transform: none;
+  animation: kedip 5.2s ease-in-out calc(1800ms + var(--urutan) * 640ms) infinite alternate;
+}
+
+/* Debu dan kabut hangat di depan subjek, hanya di dalam bingkai cahaya.
+   Ikut bergerak dengan p sebagai bidang terdekat kedua. */
+.hero__debu {
+  position: absolute;
+  inset: -12% 0 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(calc(var(--p) * -9cqh)) scale(calc(1 + 0.08 * var(--p)));
+  transition: opacity 2400ms ease-out 1200ms;
+}
+
+.undangan[data-terbuka] .hero__debu {
+  opacity: 1;
+}
+
+.hero__debu::before,
+.hero__debu::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.hero__debu::before {
+  background-image:
+    radial-gradient(1.6px 1.6px at 14% 38%, rgb(255 222 176 / 0.7), transparent),
+    radial-gradient(1.2px 1.2px at 27% 62%, rgb(255 222 176 / 0.55), transparent),
+    radial-gradient(2px 2px at 41% 24%, rgb(255 222 176 / 0.5), transparent),
+    radial-gradient(1.4px 1.4px at 58% 47%, rgb(255 222 176 / 0.6), transparent),
+    radial-gradient(1.8px 1.8px at 66% 71%, rgb(255 222 176 / 0.45), transparent),
+    radial-gradient(1.2px 1.2px at 79% 33%, rgb(255 222 176 / 0.6), transparent),
+    radial-gradient(1.6px 1.6px at 88% 58%, rgb(255 222 176 / 0.5), transparent),
+    radial-gradient(1.3px 1.3px at 33% 84%, rgb(255 222 176 / 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 72% 16%, rgb(255 222 176 / 0.55), transparent);
+  animation: debu 26s ease-in-out infinite alternate;
+}
+
+.hero__debu::after {
+  background: radial-gradient(70% 34% at 50% 92%, rgb(227 168 87 / 0.09), transparent 70%);
+  mix-blend-mode: screen;
+}
+
+.hero__panggung:not([data-di-layar]) .hero__pendar,
+.hero__panggung:not([data-di-layar]) .hero__debu::before {
+  animation-play-state: paused;
+}
+
+/* Ponsel: pita gelap di bawah nama. Saudara dari blok teks. */
+.hero__scrim {
+  position: absolute;
+  inset: auto 0 0;
+  height: 52%;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--sc-canvas) 92%, transparent) 0%,
+    color-mix(in oklab, var(--sc-canvas) 66%, transparent) 38%,
+    transparent
+  );
+}
+
+.hero__teks {
+  position: absolute;
+  z-index: var(--sc-z-copy);
+  inset: auto 1.5rem max(2.75rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 1000ms var(--sc-ease-out) 1100ms,
+    transform 1000ms var(--sc-ease-out) 1100ms;
+}
+
+.undangan[data-terbuka] .hero__teks {
+  opacity: 1;
+  transform: none;
+}
+
+.hero__nama {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 12.5cqw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.hero__nama:focus {
+  outline: none;
+}
+
+.hero__baris {
+  display: block;
+}
+
+.hero__dan {
+  font-style: italic;
+  color: var(--sc-accent);
+}
+
+.hero__tanggal {
+  margin: 1.125rem 0 0;
+}
+
+/* Layar lebar: jendela cahaya tegak yang memudar ke gelap, nama di kolom gelap sebelah kiri. */
+@media (min-aspect-ratio: 5/4) {
+  .hero {
+    --skala-latar: calc(1 + 0.25 * var(--p));
+    --skala-subjek: calc(1.03 + 0.3 * var(--p));
+  }
+
+  .hero__bingkai {
+    --lebar-bingkai: calc(112cqh / var(--rasio-bingkai));
+    height: 112cqh;
+    left: calc(62cqw - var(--lebar-bingkai) / 2);
+    top: -6cqh;
+  }
+
+  .hero__poster,
+  .hero__jauh,
+  .hero__debu {
+    --pudar-x: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
+    --pudar-y: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: var(--pudar-x), var(--pudar-y);
+    -webkit-mask-composite: source-in;
+    mask-image: var(--pudar-x), var(--pudar-y);
+    mask-composite: intersect;
+  }
+
+  .hero__depan {
+    --lebar: 40cqw;
+    --turun: 55cqh;
+  }
+
+  .hero__scrim {
+    display: none;
+  }
+
+  /* Kolom teks berakhir sedikit di dalam tepi jendela yang masih gelap. */
+  .hero__teks {
+    inset: 50% auto auto var(--tepi-lebar);
+    width: calc(62cqw - 0.4 * 112cqh / var(--rasio-bingkai) - var(--tepi-lebar));
+    translate: 0 -50%;
+  }
+
+  .hero__nama {
+    font-size: clamp(2.6rem, 5.2cqw, 6rem);
+  }
+}
+
+/* Sampul di layar lebar: kolom kiri yang sama dengan nama di Hero. */
+@media (min-aspect-ratio: 5/4) {
+  .sampul::before {
+    inset: 0 auto 0 0;
+    width: 62%;
+    background: linear-gradient(to right, color-mix(in oklab, var(--sc-canvas) 88%, transparent) 50%, transparent);
+  }
+
+  .sampul__isi {
+    max-width: min(38rem, calc(62vw - 30vh));
+    margin-block: auto;
+    padding: 2rem 0 2rem var(--tepi-lebar);
+  }
+}
+
+/* Layar pendek (ponsel mendatar): jarak antarbagian Sampul dirapatkan. */
+@media (max-height: 560px) {
+  .sampul__tamu {
+    margin-top: 1.25rem;
+    padding-top: 0.875rem;
+  }
+
+  .sampul__buka {
+    margin-top: 1.25rem;
+  }
+}
+
+/* ------------------------------------------------------------- tombol musik -- */
+.tombol-musik {
+  position: fixed;
+  z-index: var(--sc-z-chrome);
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  background: color-mix(in oklab, var(--sc-canvas) 62%, transparent);
+  color: var(--sc-ink);
+  cursor: pointer;
+  animation: muncul 600ms var(--sc-ease-out) 1600ms both;
+  transition: transform 140ms var(--sc-ease-out);
+}
+
+.tombol-musik:active {
+  transform: scale(0.97);
+}
+
+.tombol-musik__batang {
+  width: 2px;
+  height: 14px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: scaleY(0.28);
+  transform-origin: bottom;
+  transition: transform 240ms var(--sc-ease-out);
+}
+
+.tombol-musik[aria-pressed="true"] .tombol-musik__batang {
+  animation: denyut 900ms ease-in-out infinite alternate;
+}
+
+.tombol-musik[aria-pressed="true"] .tombol-musik__batang:nth-child(2) {
+  animation-duration: 700ms;
+  animation-delay: -300ms;
+}
+
+.tombol-musik[aria-pressed="true"] .tombol-musik__batang:nth-child(3) {
+  animation-duration: 1100ms;
+  animation-delay: -600ms;
+}
+
+/* --------------------------------------------------------------------- kaki -- */
+.kaki {
+  padding: var(--sc-8) 1.5rem max(var(--sc-7), calc(env(safe-area-inset-bottom) + 1.5rem));
+  border-top: 1px solid var(--sc-hairline);
+}
+
+.kaki__mempelai {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+}
+
+.kaki__tanggal {
+  margin: 0.375rem 0 0;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  .kaki {
+    padding-inline: var(--tepi-lebar);
+  }
+}
+
+/* ---------------------------------------------------------------- keyframes -- */
+@keyframes muncul {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kedip {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.94;
+  }
+  70% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes debu {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-1.5%, -7%, 0);
+  }
+}
+
+@keyframes denyut {
+  from {
+    transform: scaleY(0.28);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ----------------------------------------------------------- gerak dikurangi -- */
+/* Komposisi diam di p=0 yang tetap berlapis. Penyalaan hanya fade 200 ms, tanpa nyala api maupun kedip. */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    --p: 0;
+  }
+
+  .sampul,
+  .tombol-musik {
+    animation-duration: 200ms;
+    animation-delay: 0s;
+  }
+
+  .sampul,
+  .hero__terang,
+  .hero__pendar,
+  .hero__debu,
+  .hero__teks {
+    transition: opacity 200ms ease-out;
+  }
+
+  .hero__pendar,
+  .undangan[data-terbuka] .hero__pendar,
+  .hero__teks {
+    transform: none;
+    animation: none;
+  }
+
+  .hero__debu::before {
+    animation: none;
+  }
+
+  .tombol-musik[aria-pressed="true"] .tombol-musik__batang {
+    animation: none;
+    transform: scaleY(0.75);
+  }
+}

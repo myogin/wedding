@@ -1,15 +1,19 @@
 import type { CSSProperties } from "react";
+import type { Gambar } from "@/konten/skema";
+import { FilmKilasan } from "./film-kilasan";
 
-type Props = { namaMempelai: string; persen?: number };
+type Props = { namaMempelai: string; foto: Gambar[]; persen?: number };
 
 /**
- * Menutupi Undangan sampai Konteks Tamu terbaca dan aset kritis Hero termuat,
- * agar Tamu tidak melihat nama berkedip atau adegan yang setengah jadi.
+ * Menutupi Undangan sampai Konteks Tamu terbaca dan aset kritis Hero termuat (minimal 5 detik),
+ * agar Tamu tidak melihat nama berkedip atau adegan yang setengah jadi. Selama menunggu,
+ * kilasan foto Mempelai diputar seperti film yang dipercepat.
  */
-export function LayarLoading({ namaMempelai, persen = 0 }: Props) {
+export function LayarLoading({ namaMempelai, foto, persen = 0 }: Props) {
   return (
     <div className="gerbang layar-loading" role="status">
       <p className="layar-loading__mempelai">{namaMempelai}</p>
+      <FilmKilasan foto={foto} />
       <div
         className="layar-loading__progres"
         role="progressbar"

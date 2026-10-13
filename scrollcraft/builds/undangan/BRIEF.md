@@ -62,6 +62,15 @@ Nama, foto, dan musik di bawah adalah Placeholder dari website referensi. Brief 
    - Musik "Rebong".
    - Tidak ada footage dan tidak ada generasi. Semua lapisan Hero dipotong secara lokal dari foto Sampul dan foto mempelai pria.
 
+### Tambahan dari Mempelai (setelah tiket 04)
+
+- *(Mempelai)*: "loading: buat minimal 5 detik untuk loading. tambahkan foto (otomatis ganti cepat) seperti ada efek film dipercepat diatas text memuat undangan".
+- Diterapkan di layar loading, sebelum Sampul:
+  - kilasan foto galeri seperti film yang dipercepat;
+  - persentase yang naik halus selama minimal 5 detik.
+- Foto diurutkan dari yang paling gelap ke yang paling terang supaya kedipannya jarang.
+- Sampul sesudahnya tetap gelap dan diam. Lompatan dari gerak cepat ke hening justru mempertegas jeda sebelum peak.
+
 ### Jawaban Step 1 (dari spec)
 
 - **Apa dan untuk siapa**: undangan pernikahan untuk tamu yang menerima Link Tamu lewat WhatsApp, kebanyakan dibuka di ponsel.

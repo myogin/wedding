@@ -51,6 +51,14 @@ test.describe("Buka Undangan", () => {
     await expect(sampul(page)).toBeVisible();
   });
 
+  test("layar loading tampil minimal 5 detik walau aset sudah siap", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(sampul(page)).toBeVisible();
+    const sejakNavigasiMs = await page.evaluate(() => performance.now());
+    expect(sejakNavigasiMs).toBeGreaterThanOrEqual(5000);
+  });
+
   test("isi Undangan baru bisa di-scroll setelah Buka Undangan", async ({ page }) => {
     await page.goto("/?to=Budi%20Santoso");
     await expect(sampul(page).getByText("Budi Santoso", { exact: true })).toBeVisible();
@@ -118,8 +126,25 @@ test.describe("Buka Undangan", () => {
   });
 });
 
-test.describe("Hero dengan gerakan penuh", () => {
+test.describe("Gerakan penuh", () => {
   test.use({ contextOptions: { reducedMotion: "no-preference" } });
+
+  test("layar loading memutar foto galeri dengan cepat", async ({ page }) => {
+    await page.goto("/");
+
+    const fotoTampil = page.getByRole("img", { name: "Kilasan foto Mempelai" }).locator("img:visible");
+    const terlihat = new Set<string>();
+    await expect
+      .poll(
+        async () => {
+          const src = await fotoTampil.first().getAttribute("src").catch(() => null);
+          if (src) terlihat.add(src);
+          return terlihat.size;
+        },
+        { intervals: [100], timeout: 4000 },
+      )
+      .toBeGreaterThanOrEqual(4);
+  });
 
   test("lapisan Hero bergerak dengan laju berbeda dan nama Mempelai tetap terlihat", async ({ page }) => {
     await page.goto("/");

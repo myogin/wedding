@@ -35,7 +35,7 @@ html:has(.undangan:not([data-terbuka])) {
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 1.75rem;
+  gap: 1.5rem;
   padding: 1.5rem;
   text-align: center;
   background: var(--sc-canvas);
@@ -87,6 +87,53 @@ html:has(.undangan:not([data-terbuka])) {
   transform: scaleX(var(--persen, 0));
   transform-origin: left;
   transition: transform 420ms var(--sc-ease-out);
+}
+
+/* Kilasan foto seperti film yang dipercepat: potongan keras, grade hangat, butiran,
+   goyang proyektor, dan kedip eksposur. Hanya transform dan opacity yang dianimasikan. */
+.film {
+  position: relative;
+  width: clamp(10rem, 48vw, 14rem);
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--sc-surface);
+  box-shadow: 0 0 0 1px var(--sc-hairline), var(--sc-e2);
+}
+
+.film__gambar {
+  position: absolute;
+  inset: -2%;
+  animation: goyang-proyektor 480ms steps(1) infinite;
+}
+
+.film__foto {
+  object-fit: cover;
+  visibility: hidden;
+  filter: sepia(0.35) saturate(0.85) contrast(0.92) brightness(0.9);
+}
+
+.film__foto[data-aktif] {
+  visibility: visible;
+}
+
+.film__butir,
+.film__vinyet {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.film__butir {
+  inset: -50%;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  animation: butir-film 360ms steps(1) infinite;
+}
+
+.film__vinyet {
+  background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(14 11 9 / 0.65));
+  animation: kedip-film 270ms steps(1) infinite;
 }
 
 /* Sampul: tanpa latar sendiri. Yang terlihat di belakangnya adalah Hero dalam keadaan padam.
@@ -612,6 +659,45 @@ html:has(.undangan:not([data-terbuka])) {
   }
 }
 
+@keyframes goyang-proyektor {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(0.6px, -0.8px, 0);
+  }
+  50% {
+    transform: translate3d(-0.4px, 0.5px, 0);
+  }
+  75% {
+    transform: translate3d(0.3px, 0.9px, 0);
+  }
+}
+
+@keyframes butir-film {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(-7%, 4%, 0);
+  }
+  66% {
+    transform: translate3d(5%, -6%, 0);
+  }
+}
+
+@keyframes kedip-film {
+  0% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 0.86;
+  }
+  66% {
+    opacity: 0.94;
+  }
+}
+
 @keyframes denyut {
   from {
     transform: scaleY(0.28);
@@ -649,7 +735,10 @@ html:has(.undangan:not([data-terbuka])) {
     animation: none;
   }
 
-  .hero__debu::before {
+  .hero__debu::before,
+  .film__gambar,
+  .film__butir,
+  .film__vinyet {
     animation: none;
   }
 

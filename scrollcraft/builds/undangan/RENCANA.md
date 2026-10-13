@@ -194,6 +194,11 @@ Periksa kedua lembar sebelum dipakai. Untuk foto baru:
     - `data-span-otomatis` pada act `pan`: span dihitung dari panjang rel, 1,1 px scroll per 1 px geseran. Kenangan (tiket 07) sebaiknya memakainya juga, karena 2.4 tetap terlalu panjang atau terlalu pendek tergantung lebar layar.
   - **Kami di ponsel:** dua baris zigzag. Di layar ≥ 3:2, satu baris: potret di dua sisi luar, teks bertemu di tengah. Bingkai potret sudah terlihat dalam keadaan padam sejak panggung masuk, supaya geser masuk tidak kosong.
   - **Fokus foto:** `Gambar` punya `fokus` opsional untuk titik potong. Placeholder pria memakai `{ x: 1 }` karena tepi kirinya putih.
+- **Sudah ada sejak tiket 06** (Hari H, `id="hari-h"`):
+  - Tombol sekunder `.tombol-garis` (garis tipis, pill). Isian accent tetap hanya untuk "Konfirmasi Kehadiran".
+  - Pola panel melayang (`.simpan-tanggal__pilihan`) untuk pilihan yang tidak boleh menambah tinggi act.
+  - Elemen tanpa media ikut menyala lewat opasitas yang digerakkan `data-menyala` (angka hitung mundur).
+  - Harness `alat/verifikasi.mjs` juga mengukur teks di dalam `role="timer"`.
 - **08–10**: act `flow` biasa, sudah sesuai score (Hadir). Lentera tamu digantung saat RSVP berhasil (bisa disusulkan di tiket 15).
 - **15**: untaian lentera, penutup, ukur panjang total, Step 5 penuh, feel check terhadap BRIEF, lalu tambahkan baris fingerprint.
   - Juga **lantai yang menghangat** (§3.3): `--terang` = jumlah stasiun ber-`data-menyala` dibagi jumlah stasiun, canvas bertahap dari `#0E0B09` ke `#1A130D`. Dibuat di tiket 15 karena baru bermakna setelah semua stasiun ada; pemicunya (`data-menyala`) sudah ada di `lentera-stasiun.ts`.

@@ -942,6 +942,227 @@ html:has(.undangan:not([data-terbuka])) {
   text-wrap: pretty;
 }
 
+/* ------------------------------------------------------------------- hari h -- */
+/* Rata kiri. Ponsel: bertumpuk. Layar lebar: hitung mundur di kolom kiri, daftar Acara di kanan. */
+.hari-h {
+  display: grid;
+  gap: var(--sc-6);
+  padding: var(--sc-section) 1.5rem;
+}
+
+.hari-h__judul {
+  margin: 0;
+  max-width: 14ch;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: var(--sc-t-2xl);
+  line-height: 1.05;
+  letter-spacing: var(--sc-track-snug);
+  text-wrap: balance;
+}
+
+/* Angka diukur dari lebar kolomnya sendiri, jadi empat satuan selalu muat satu baris di samping daftar Acara. */
+.hari-h__hitung {
+  container-type: inline-size;
+}
+
+/* Tinggi dicadangkan untuk angka dan satuannya, supaya pergantian ke pesan tidak menggeser act sesudahnya. */
+.hitung {
+  --hitung-angka: min(5.5rem, 15cqi);
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1rem, 5cqi, 2.75rem);
+  min-height: calc(var(--hitung-angka) + 1.5rem);
+}
+
+/* Angka ikut menyala bersama stasiunnya (RENCANA.md §3), seperti media yang menghangat. Saat padam
+   kontrasnya tetap di atas 3:1 (teks besar); label satuan yang kecil tidak ikut diredupkan. */
+.hitung__angka,
+.hitung__pesan {
+  opacity: 0.55;
+  transition: opacity 1400ms var(--sc-ease-out);
+}
+
+.hari-h[data-menyala] :is(.hitung__angka, .hitung__pesan) {
+  opacity: 1;
+}
+
+.hitung__unit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.hitung__angka {
+  min-width: 2ch;
+  font-family: var(--sc-font-display);
+  font-size: var(--hitung-angka);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.hitung__satuan {
+  color: var(--sc-ink-soft);
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hitung__pesan {
+  margin: 0;
+  color: var(--sc-accent);
+  font-family: var(--sc-font-display);
+  font-style: italic;
+  font-size: var(--sc-t-xl);
+  line-height: 1.2;
+}
+
+.hari-h__acara {
+  display: grid;
+  gap: var(--sc-7);
+  margin-top: var(--sc-4);
+}
+
+.acara {
+  padding-top: var(--sc-5);
+  border-top: 1px solid var(--sc-hairline-strong);
+}
+
+.acara__nama {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: var(--sc-t-xl);
+  line-height: 1.1;
+}
+
+.acara__tanggal {
+  margin: var(--sc-3) 0 0;
+  font-size: var(--sc-t-base);
+}
+
+.acara__jam {
+  margin: 0.25rem 0 0;
+  color: var(--sc-accent);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.acara__lokasi {
+  display: grid;
+  gap: 0.125rem;
+  max-width: 40ch;
+  margin-top: var(--sc-4);
+  color: var(--sc-ink-soft);
+  font-style: normal;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.acara__tempat {
+  color: var(--sc-ink);
+}
+
+/* Panel pilihan kalender berjangkar ke baris ini (selebar kolom), jadi tidak pernah meluap ke luar layar. */
+.acara__aksi {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc-3);
+  margin-top: var(--sc-5);
+}
+
+/* Tombol sekunder. Isian accent hanya milik satu aksi utama, "Konfirmasi Kehadiran". */
+.tombol-garis {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  background: transparent;
+  color: var(--sc-ink);
+  font: 500 0.8125rem/1 var(--sc-font-text);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 140ms var(--sc-ease-out);
+}
+
+.tombol-garis:active {
+  transform: scale(0.97);
+}
+
+.tombol-garis[aria-expanded="true"] {
+  border-color: var(--sc-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tombol-garis:hover {
+    border-color: var(--sc-accent);
+  }
+}
+
+/* Pilihan kalender melayang di atas halaman, jadi tinggi act tidak berubah saat dibuka. */
+.simpan-tanggal__pilihan {
+  position: absolute;
+  z-index: var(--sc-z-copy);
+  top: calc(100% + 0.5rem);
+  left: 0;
+  display: grid;
+  width: min(100%, 17rem);
+  padding: 0.375rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-sm);
+  background: var(--sc-surface);
+  box-shadow: var(--sc-e3), var(--sc-edge);
+  animation: muncul 160ms var(--sc-ease-out);
+}
+
+.simpan-tanggal__pilihan[hidden] {
+  display: none;
+}
+
+.simpan-tanggal__pilihan a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border-radius: 4px;
+  color: var(--sc-ink);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.simpan-tanggal__pilihan a:focus-visible {
+  outline-offset: -2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .simpan-tanggal__pilihan a:hover {
+    background: color-mix(in oklab, var(--sc-ink) 8%, transparent);
+  }
+}
+
+@media (min-width: 900px) {
+  .hari-h {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(3rem, 7vw, 8rem);
+    align-items: start;
+    padding-inline: var(--tepi-lebar);
+  }
+
+  .hari-h__acara {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+  }
+}
+
 /* --------------------------------------------------------------------- kaki -- */
 .kaki {
   padding: var(--sc-8) 1.5rem max(var(--sc-7), calc(env(safe-area-inset-bottom) + 1.5rem));
@@ -1131,7 +1352,9 @@ html:has(.undangan:not([data-terbuka])) {
     pointer-events: auto !important;
   }
 
-  .media-redup::after {
+  .media-redup::after,
+  .hitung__angka,
+  .hitung__pesan {
     transition-duration: 200ms;
   }
 }

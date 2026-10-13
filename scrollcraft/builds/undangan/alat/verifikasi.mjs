@@ -35,7 +35,8 @@ const SHEET = path.resolve(arg("--sheet", `scrollcraft/builds/undangan/lab/verif
 
 /** Rata-rata selisih piksel (0..255) di bawah ini dianggap layar tidak berubah. */
 const AMBANG_MATI = 0.6;
-const BLOK_TEKS = "h1, h2, h3, p, li, a, button";
+// Angka hitung mundur berupa span di dalam role="timer"; blok terdalam saja yang diukur.
+const BLOK_TEKS = "h1, h2, h3, p, li, a, button, [role='timer'] span";
 
 fs.rmSync(KELUAR, { recursive: true, force: true });
 fs.mkdirSync(KELUAR, { recursive: true });

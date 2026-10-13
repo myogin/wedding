@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { GerbangUndangan } from "@/komponen/gerbang-undangan";
+import { HariH } from "@/komponen/hari-h";
 import { Hero } from "@/komponen/hero";
 import { Kami } from "@/komponen/kami";
 import { KisahCinta } from "@/komponen/kisah-cinta";
@@ -16,7 +17,8 @@ import "./undangan.css";
 export default async function HalamanUndangan() {
   const { sampul, mempelai, musik, galeri, pembuka, kisahCinta } = kontenUndangan;
   const nama = namaMempelai(kontenUndangan);
-  const tanggal = formatTanggalAcara(acaraUtama(kontenUndangan));
+  const utama = acaraUtama(kontenUndangan);
+  const tanggal = formatTanggalAcara(utama);
   const kilasan = await urutkanKilasan(galeri);
 
   return (
@@ -47,6 +49,7 @@ export default async function HalamanUndangan() {
         <Restu pembuka={pembuka} />
         <Kami mempelai={mempelai} />
         {kisahCinta && kisahCinta.length > 0 && <KisahCinta kisah={kisahCinta} />}
+        <HariH acara={kontenUndangan.acara} acaraUtama={utama} namaMempelai={nama} />
         <footer className="kaki">
           <p className="kaki__mempelai">{nama}</p>
           <p className="kaki__tanggal label-tanggal">{tanggal}</p>

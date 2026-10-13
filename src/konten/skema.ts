@@ -36,25 +36,29 @@ const skemaMempelai = z.object({
   foto: skemaGambar,
 });
 
+/** Zona waktu Indonesia. Tidak ada musim panas, jadi selisihnya terhadap UTC selalu tetap. */
 export const ZONA_WAKTU = {
-  "Asia/Jakarta": "WIB",
-  "Asia/Pontianak": "WIB",
-  "Asia/Makassar": "WITA",
-  "Asia/Jayapura": "WIT",
+  "Asia/Jakarta": { label: "WIB", selisihUtc: "+07:00" },
+  "Asia/Pontianak": { label: "WIB", selisihUtc: "+07:00" },
+  "Asia/Makassar": { label: "WITA", selisihUtc: "+08:00" },
+  "Asia/Jayapura": { label: "WIT", selisihUtc: "+09:00" },
 } as const;
 
-const skemaAcara = z.object({
-  ...penandaPlaceholder,
-  id: skemaId,
-  nama: z.string().min(1),
-  mulai: waktuLokal,
-  /** Kosong berarti tampil "Selesai". */
-  selesai: waktuLokal.optional(),
-  zonaWaktu: z.enum(Object.keys(ZONA_WAKTU) as [keyof typeof ZONA_WAKTU, ...(keyof typeof ZONA_WAKTU)[]]),
-  tempat: z.string().min(1).optional(),
-  alamat: z.string().min(1),
-  peta: z.url(),
-});
+const skemaAcara = z
+  .object({
+    ...penandaPlaceholder,
+    id: skemaId,
+    nama: z.string().min(1),
+    mulai: waktuLokal,
+    /** Kosong berarti tampil "Selesai", dan Acara dianggap berakhir di akhir hari mulainya. */
+    selesai: waktuLokal.optional(),
+    zonaWaktu: z.enum(Object.keys(ZONA_WAKTU) as [keyof typeof ZONA_WAKTU, ...(keyof typeof ZONA_WAKTU)[]]),
+    tempat: z.string().min(1).optional(),
+    alamat: z.string().min(1),
+    peta: z.url(),
+  })
+  // Kedua waktu berformat sama, jadi urutan teksnya sama dengan urutan waktunya.
+  .refine((a) => !a.selesai || a.selesai > a.mulai, { path: ["selesai"], message: "harus setelah waktu mulai" });
 
 const skemaRekening = z.object({
   ...penandaPlaceholder,

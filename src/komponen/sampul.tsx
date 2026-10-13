@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useRef } from "react";
+import { useTransisiKeluar } from "./transisi-keluar";
 
 const SAPAAN_UMUM = "Bapak/Ibu/Saudara/i";
-/** Batas aman bila transitionend tidak datang (mis. tab di latar belakang). */
-const BATAS_KELUAR_MS = 1500;
 
 type Props = {
   judul: string;
@@ -24,21 +23,7 @@ type Props = {
  */
 export function Sampul({ judul, namaMempelai, tanggal, catatanMaaf, namaTamu, keluar, onBuka, onSelesaiKeluar }: Props) {
   const akar = useRef<HTMLElement>(null);
-  const akhiri = useEffectEvent(() => onSelesaiKeluar());
-
-  useEffect(() => {
-    if (!keluar) return;
-    const el = akar.current;
-    const padaTransisi = (e: TransitionEvent) => {
-      if (e.target === el && e.propertyName === "opacity") akhiri();
-    };
-    el?.addEventListener("transitionend", padaTransisi);
-    const cadangan = setTimeout(() => akhiri(), BATAS_KELUAR_MS);
-    return () => {
-      el?.removeEventListener("transitionend", padaTransisi);
-      clearTimeout(cadangan);
-    };
-  }, [keluar]);
+  useTransisiKeluar(akar, keluar, onSelesaiKeluar);
 
   return (
     <section ref={akar} className="gerbang sampul" aria-label="Sampul" data-keluar={keluar || undefined} inert={keluar}>

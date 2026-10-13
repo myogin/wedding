@@ -1,19 +1,35 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useRef, type CSSProperties } from "react";
 import type { Gambar } from "@/konten/skema";
 import { FilmKilasan } from "./film-kilasan";
+import { useTransisiKeluar } from "./transisi-keluar";
 
-type Props = { namaMempelai: string; foto: Gambar[]; persen?: number };
+type Props = {
+  namaMempelai: string;
+  foto: Gambar[];
+  persen: number;
+  /** Loading selesai: layar memudar dan bingkai film membesar, bersilang dengan Sampul di bawahnya. */
+  keluar: boolean;
+  onSelesaiKeluar(): void;
+};
 
 /**
- * Menutupi Undangan sampai Konteks Tamu terbaca dan aset kritis Hero termuat (minimal 5 detik),
- * agar Tamu tidak melihat nama berkedip atau adegan yang setengah jadi. Selama menunggu,
- * kilasan foto Mempelai diputar seperti film yang dipercepat.
+ * Menutupi Undangan sampai aset kritis Hero termuat (minimal 3 detik), agar Tamu tidak melihat
+ * adegan yang setengah jadi. Selama menunggu, kilasan foto Mempelai diputar seperti film yang dipercepat.
+ * Di-render di luar boundary Suspense, jadi elemennya tetap sama sejak HTML awal dan animasi masuknya
+ * tidak terulang saat halaman selesai dimuat.
  */
-export function LayarLoading({ namaMempelai, foto, persen = 0 }: Props) {
+export function LayarLoading({ namaMempelai, foto, persen, keluar, onSelesaiKeluar }: Props) {
+  const akar = useRef<HTMLDivElement>(null);
+  useTransisiKeluar(akar, keluar, onSelesaiKeluar);
+
   return (
-    <div className="gerbang layar-loading" role="status">
+    <div ref={akar} className="gerbang layar-loading" role="status" data-keluar={keluar || undefined}>
       <p className="layar-loading__mempelai">{namaMempelai}</p>
-      <FilmKilasan foto={foto} />
+      <div className="layar-loading__proyektor">
+        <FilmKilasan foto={foto} />
+      </div>
       <div
         className="layar-loading__progres"
         role="progressbar"

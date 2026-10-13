@@ -67,7 +67,7 @@ Nama, foto, dan musik di bawah adalah Placeholder dari website referensi. Brief 
 - *(Mempelai)*: "loading: buat minimal 5 detik untuk loading. tambahkan foto (otomatis ganti cepat) seperti ada efek film dipercepat diatas text memuat undangan".
 - Diterapkan di layar loading, sebelum Sampul:
   - kilasan foto galeri seperti film yang dipercepat;
-  - persentase yang naik halus selama minimal 5 detik.
+  - persentase yang naik halus selama minimal 3 detik (Mempelai kemudian mengubah 5 detik menjadi 3 detik).
 - Foto diurutkan dari yang paling gelap ke yang paling terang supaya kedipannya jarang.
 - Sampul sesudahnya tetap gelap dan diam. Lompatan dari gerak cepat ke hening justru mempertegas jeda sebelum peak.
 

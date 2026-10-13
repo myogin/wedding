@@ -72,10 +72,16 @@
 
 **Tambahan atas permintaan Mempelai (layar loading):**
 
-- Loading tampil **minimal 5 detik**, dihitung sejak navigasi dimulai. Persentase yang tampil adalah yang paling lambat antara waktu dan byte aset Hero, jadi naik halus dan baru 100% bila keduanya selesai.
-- **Kilasan foto** di atas tulisan "Memuat undangan": foto galeri berganti setiap 180 ms dengan potongan keras, grade sepia hangat, butiran, goyang proyektor, dan kedip eksposur.
+- Loading tampil **minimal 3 detik** (semula 5 detik, diubah atas permintaan Mempelai), dihitung sejak navigasi dimulai. Persentase yang tampil adalah yang paling lambat antara waktu dan byte aset Hero, jadi naik halus dan baru 100% bila keduanya selesai.
+- **Kilasan foto** di atas tulisan "Memuat undangan": foto galeri berganti setiap 60 ms (sebelumnya 180 ms, dipercepat 3× atas permintaan Mempelai) dengan potongan keras, grade sepia hangat, butiran, goyang proyektor, dan kedip eksposur.
   - Foto diurutkan dari gelap ke terang saat build (`urutkanKilasan`, sharp), supaya hanya ada satu lompatan terang ke gelap per putaran. Ini mengurangi kedipan yang berisiko bagi Tamu yang peka.
   - Dengan gerakan dikurangi, foto berganti setiap 1,6 detik tanpa efek proyektor.
   - Gambar dioptimasi next/image (versi 640 px, ±200–235 KB untuk 10 foto).
-- **E2E:** dua tes baru (loading ≥ 5 detik; foto berganti cepat), batas `expect` dinaikkan ke 10 detik. Seluruh suite 28/28 lulus terhadap image produksi.
+- **Animasi layar loading:**
+  - Masuk: nama, film, lalu progres muncul bergiliran (fade dan naik 12 px).
+  - Selama menunggu: cahaya proyektor redup berdenyut di belakang bingkai film.
+  - Keluar: layar memudar 0,8 detik sementara film membesar ke 1,06, bersilang dengan Sampul yang muncul di bawahnya.
+  - Layar loading kini dirender kerangka di luar boundary Suspense, supaya animasi masuknya tidak terulang saat halaman selesai dimuat. Sampul dan tombol musik tetap di dalam boundary.
+  - Dengan gerakan dikurangi: hanya fade 200 ms.
+- **E2E:** dua tes baru (loading ≥ 3 detik; foto berganti cepat), batas `expect` dinaikkan ke 10 detik. Seluruh suite 28/28 lulus terhadap image produksi.
 

@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { GerbangUndangan } from "@/komponen/gerbang-undangan";
 import { Hero } from "@/komponen/hero";
-import { LayarLoading } from "@/komponen/layar-loading";
 import { RangkaUndangan } from "@/komponen/rangka-undangan";
 import { acaraUtama, kontenUndangan, namaMempelai } from "@/konten";
 import { formatTanggalAcara } from "@/konten/format";
@@ -20,16 +19,18 @@ export default async function HalamanUndangan() {
   return (
     <main>
       <RangkaUndangan
+        namaMempelai={nama}
+        kilasan={kilasan}
         gerbang={
-          // Konteks Tamu dibaca di browser; halaman tetap statis dan fallback-nya ikut di HTML awal.
-          <Suspense fallback={<LayarLoading namaMempelai={nama} foto={kilasan} />}>
+          // Konteks Tamu dibaca di browser; halaman tetap statis. Selama itu layar loading
+          // (dirender kerangka, di luar boundary ini) sudah menutupi halaman.
+          <Suspense fallback={null}>
             <GerbangUndangan
               judul={sampul.judul}
               namaMempelai={nama}
               tanggal={tanggal}
               catatanMaaf={sampul.catatanMaaf}
               musik={musik}
-              kilasan={kilasan}
             />
           </Suspense>
         }

@@ -10,7 +10,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-  // Layar loading tampil minimal 5 detik, jadi Sampul baru muncul setelah itu.
+  // Layar loading tampil minimal 3 detik (ditambah transisi keluarnya), jadi Sampul baru muncul setelah itu.
   expect: { timeout: 10_000 },
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,

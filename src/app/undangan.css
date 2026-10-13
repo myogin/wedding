@@ -31,6 +31,9 @@ html:has(.undangan:not([data-terbuka])) {
   z-index: 70;
 }
 
+/* Layar loading masuk bergiliran (nama, film, progres) sejak HTML awal, lalu keluar dengan memudar
+   sementara bingkai film membesar seperti kamera masuk ke foto, bersilang dengan Sampul di bawahnya.
+   Fill-mode backwards: setelah animasi masuk selesai, transisi keluar bebas mengubah transform. */
 .layar-loading {
   display: grid;
   place-content: center;
@@ -39,6 +42,12 @@ html:has(.undangan:not([data-terbuka])) {
   padding: 1.5rem;
   text-align: center;
   background: var(--sc-canvas);
+  transition: opacity 800ms var(--sc-ease-out);
+}
+
+.layar-loading[data-keluar] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .layar-loading__mempelai {
@@ -46,9 +55,33 @@ html:has(.undangan:not([data-terbuka])) {
   font-family: var(--sc-font-display);
   font-size: clamp(1.75rem, 6vw, 2.75rem);
   letter-spacing: -0.01em;
+  animation: masuk-naik 1000ms var(--sc-ease-out) 120ms backwards;
+}
+
+/* Cahaya proyektor redup di belakang bingkai film, berdenyut pelan. */
+.layar-loading__proyektor {
+  position: relative;
+  isolation: isolate;
+  animation: masuk-film 1100ms var(--sc-ease-out) 300ms backwards;
+  transition: transform 1000ms var(--sc-ease-out);
+}
+
+.layar-loading__proyektor::before {
+  content: "";
+  position: absolute;
+  inset: -28% -45%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(227 168 87 / 0.16), rgb(227 168 87 / 0));
+  animation: denyut-proyektor 2600ms ease-in-out infinite alternate;
+}
+
+.layar-loading[data-keluar] .layar-loading__proyektor {
+  transform: scale(1.06);
 }
 
 .layar-loading__progres {
+  animation: masuk-naik 1000ms var(--sc-ease-out) 480ms backwards;
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
@@ -104,7 +137,7 @@ html:has(.undangan:not([data-terbuka])) {
 .film__gambar {
   position: absolute;
   inset: -2%;
-  animation: goyang-proyektor 480ms steps(1) infinite;
+  animation: goyang-proyektor 160ms steps(1) infinite;
 }
 
 .film__foto {
@@ -128,12 +161,12 @@ html:has(.undangan:not([data-terbuka])) {
   inset: -50%;
   opacity: 0.12;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
-  animation: butir-film 360ms steps(1) infinite;
+  animation: butir-film 120ms steps(1) infinite;
 }
 
 .film__vinyet {
   background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(14 11 9 / 0.65));
-  animation: kedip-film 270ms steps(1) infinite;
+  animation: kedip-film 90ms steps(1) infinite;
 }
 
 /* Sampul: tanpa latar sendiri. Yang terlihat di belakangnya adalah Hero dalam keadaan padam.
@@ -659,6 +692,29 @@ html:has(.undangan:not([data-terbuka])) {
   }
 }
 
+@keyframes masuk-naik {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes masuk-film {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes denyut-proyektor {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes goyang-proyektor {
   0% {
     transform: translate3d(0, 0, 0);
@@ -718,6 +774,25 @@ html:has(.undangan:not([data-terbuka])) {
   .tombol-musik {
     animation-duration: 200ms;
     animation-delay: 0s;
+  }
+
+  /* Layar loading: hanya fade singkat, tanpa gerak naik, skala, maupun denyut. */
+  .layar-loading__mempelai,
+  .layar-loading__proyektor,
+  .layar-loading__progres {
+    animation: muncul 200ms ease-out backwards;
+  }
+
+  .layar-loading {
+    transition-duration: 200ms;
+  }
+
+  .layar-loading[data-keluar] .layar-loading__proyektor {
+    transform: none;
+  }
+
+  .layar-loading__proyektor::before {
+    animation: none;
   }
 
   .sampul,

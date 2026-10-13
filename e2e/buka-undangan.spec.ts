@@ -51,12 +51,12 @@ test.describe("Buka Undangan", () => {
     await expect(sampul(page)).toBeVisible();
   });
 
-  test("layar loading tampil minimal 5 detik walau aset sudah siap", async ({ page }) => {
+  test("layar loading tampil minimal 3 detik walau aset sudah siap", async ({ page }) => {
     await page.goto("/");
 
     await expect(sampul(page)).toBeVisible();
     const sejakNavigasiMs = await page.evaluate(() => performance.now());
-    expect(sejakNavigasiMs).toBeGreaterThanOrEqual(5000);
+    expect(sejakNavigasiMs).toBeGreaterThanOrEqual(3000);
   });
 
   test("isi Undangan baru bisa di-scroll setelah Buka Undangan", async ({ page }) => {

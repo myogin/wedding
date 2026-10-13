@@ -870,9 +870,13 @@ html:has(.undangan:not([data-terbuka])) {
 }
 
 /* ------------------------------------------------------------- kisah cinta -- */
-.kisah__panggung {
+/* Panggung dan judul rel act `pan`, dipakai bersama Kisah Cinta dan Kenangan. safe center: rel yang lebih
+   pendek dari layar ditaruh di tengah; yang lebih panjang tetap mulai dari kiri, tempat engine menggesernya. */
+.kisah__panggung,
+.kenangan__panggung {
   display: flex;
   align-items: center;
+  justify-content: safe center;
   background: var(--sc-canvas);
 }
 
@@ -892,7 +896,8 @@ html:has(.undangan:not([data-terbuka])) {
   width: min(70vw, 20rem);
 }
 
-.kisah__judul {
+.kisah__judul,
+.kenangan__judul {
   margin: 0;
   font-family: var(--sc-font-display);
   font-weight: 400;
@@ -1163,6 +1168,242 @@ html:has(.undangan:not([data-terbuka])) {
   }
 }
 
+/* ----------------------------------------------------------------- kenangan -- */
+/* Dinding foto dua baris yang dilalui menyamping. Kolom foto bergantian sedikit naik dan turun.
+   Tinggi baris sama dengan TINGGI_BARIS di kenangan.tsx (dipakai untuk atribut sizes). */
+.kenangan {
+  --kenangan-baris: 27svh;
+  --kenangan-celah: 0.75rem;
+}
+
+/* Pembungkus klik untuk lightbox; tidak ikut menata letak. */
+.galeri-lightbox {
+  display: contents;
+}
+
+/* flex: none, karena rel adalah flex item panggung: tanpa itu kolomnya menyusut dan memotong foto. */
+.kenangan__rel {
+  flex: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, var(--kenangan-baris));
+  gap: var(--kenangan-celah);
+  width: max-content;
+  margin: 0;
+  padding: 0 var(--tepi-lebar);
+  list-style: none;
+}
+
+.kenangan__pembuka,
+.kenangan__penutup {
+  grid-row: 1 / -1;
+  align-self: center;
+}
+
+.kenangan__pembuka {
+  padding-right: clamp(1.5rem, 6vw, 5rem);
+}
+
+.kenangan__penutup {
+  width: min(68vw, 19rem);
+  padding-left: clamp(1.5rem, 6vw, 5rem);
+}
+
+.kenangan__penutup p {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-family: var(--sc-font-display);
+  font-style: italic;
+  font-size: var(--sc-t-lg);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.kenangan__foto {
+  height: var(--kenangan-baris);
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+/* Kolom foto ganjil (anak ke-2 dan ke-3, ke-6 dan ke-7, ...) naik, kolom genap turun. */
+.kenangan__foto:nth-child(4n + 2),
+.kenangan__foto:nth-child(4n + 3) {
+  translate: 0 -1.5svh;
+}
+
+.kenangan__foto:nth-child(4n),
+.kenangan__foto:nth-child(4n + 1) {
+  translate: 0 1.5svh;
+}
+
+.kenangan__tombol {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+/* Lebar mengikuti tinggi baris dan rasio foto. max-width bawaan engine (100%) dilepas, karena tombol
+   selebar isinya: persentase itu membuat foto dihitung selebar 0 saat grid mengukur kolom. */
+.kenangan__tombol img {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: var(--kenangan-baris);
+  transition: transform 180ms var(--sc-ease-out);
+}
+
+.kenangan__tombol:active img {
+  transform: scale(0.98);
+}
+
+.kenangan__tombol:focus-visible {
+  outline-offset: -3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kenangan__tombol:hover img {
+    transform: scale(1.02);
+  }
+}
+
+/* Layar lebar: 33svh. Di layar ultrawide (21:9 ke atas) baris ikut membesar dengan lebar layar, supaya
+   rel tetap lebih panjang dari layar dan tetap bergeser; tingginya dibatasi 42svh. */
+@media (min-width: 900px) {
+  .kenangan {
+    --kenangan-baris: min(max(33svh, calc((100vw - 60rem) / 4)), 42svh);
+    --kenangan-celah: 1.25rem;
+  }
+}
+
+/* ----------------------------------------------------------------- lightbox -- */
+/* <dialog> modal selebar layar di top layer. Latarnya ::backdrop; klik di latar menutupnya. */
+.lightbox {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  color: var(--sc-ink);
+}
+
+.lightbox::backdrop {
+  background: color-mix(in oklab, var(--sc-canvas) 95%, transparent);
+}
+
+.lightbox[open],
+.lightbox[open]::backdrop {
+  animation: muncul 200ms var(--sc-ease-out);
+}
+
+/* Halaman di belakang tidak ikut tergulir (iOS Safari tetap menggulirnya di belakang dialog modal). */
+html:has(.lightbox[open]) {
+  overflow: hidden;
+}
+
+/* Track minmax(0, 1fr), bukan auto: track auto tumbuh mengikuti foto dan max-height-nya tidak berlaku. */
+.lightbox__isi {
+  position: relative;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: max(4rem, calc(env(safe-area-inset-top) + 3rem)) 1rem max(5rem, calc(env(safe-area-inset-bottom) + 4rem));
+}
+
+.lightbox__panggung {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  /* Usap mendatar milik lightbox; usap tegak dan cubit tetap milik browser. */
+  touch-action: pan-y pinch-zoom;
+  /* Kembali ke tempatnya setelah seretan pendek; selama diseret, foto mengikuti jari tanpa jeda. */
+  transition: transform 200ms var(--sc-ease-out);
+}
+
+.lightbox__panggung[data-diseret] {
+  transition: none;
+}
+
+/* Lebar dan tinggi sama-sama auto dengan batas maksimum, jadi rasio foto terjaga. */
+.lightbox__gambar {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 3px;
+  box-shadow: var(--sc-e3);
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: muncul 180ms var(--sc-ease-out);
+}
+
+.lightbox__kendali {
+  position: absolute;
+  right: 0;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sc-5);
+}
+
+.lightbox__posisi {
+  min-width: 5.5rem;
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightbox__tombol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  background: color-mix(in oklab, var(--sc-canvas) 62%, transparent);
+  color: var(--sc-ink);
+  cursor: pointer;
+  transition: transform 140ms var(--sc-ease-out);
+}
+
+.lightbox__tombol:active {
+  transform: scale(0.97);
+}
+
+.lightbox__tombol svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lightbox__tutup {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+}
+
 /* --------------------------------------------------------------------- kaki -- */
 .kaki {
   padding: var(--sc-8) 1.5rem max(var(--sc-7), calc(env(safe-area-inset-bottom) + 1.5rem));
@@ -1356,5 +1597,10 @@ html:has(.undangan:not([data-terbuka])) {
   .hitung__angka,
   .hitung__pesan {
     transition-duration: 200ms;
+  }
+
+  .kenangan__tombol img,
+  .lightbox__panggung {
+    transition: none;
   }
 }

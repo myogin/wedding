@@ -3,6 +3,7 @@ import { GerbangUndangan } from "@/komponen/gerbang-undangan";
 import { HariH } from "@/komponen/hari-h";
 import { Hero } from "@/komponen/hero";
 import { Kami } from "@/komponen/kami";
+import { Kenangan } from "@/komponen/kenangan";
 import { KisahCinta } from "@/komponen/kisah-cinta";
 import { RangkaUndangan } from "@/komponen/rangka-undangan";
 import { Restu } from "@/komponen/restu";
@@ -50,6 +51,7 @@ export default async function HalamanUndangan() {
         <Kami mempelai={mempelai} />
         {kisahCinta && kisahCinta.length > 0 && <KisahCinta kisah={kisahCinta} />}
         <HariH acara={kontenUndangan.acara} acaraUtama={utama} namaMempelai={nama} />
+        <Kenangan galeri={galeri} />
         <footer className="kaki">
           <p className="kaki__mempelai">{nama}</p>
           <p className="kaki__tanggal label-tanggal">{tanggal}</p>

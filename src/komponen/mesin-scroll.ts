@@ -3,6 +3,7 @@
 import { useEffect, type RefObject } from "react";
 import type { InstansScrollCraft } from "@/scrollcraft/scrollcraft.js";
 import { pasangLenteraStasiun } from "./lentera-stasiun";
+import { geseranRel, pasangFokusRel, pasangMuatAwalRel } from "./rel-pan";
 
 const muatEngine = () => import("@/scrollcraft/scrollcraft.js");
 
@@ -18,13 +19,18 @@ function pakaiSpanStatis(akar: HTMLElement) {
   });
 }
 
-/** Act `pan` bertanda `data-span-otomatis` mendapat span sesuai panjang relnya di layar ini. */
+/**
+ * Act `pan` bertanda `data-span-otomatis` mendapat span sesuai panjang relnya di layar ini, paling banyak
+ * `data-span-maks` bila diisi (mis. supaya peak tetap punya ruang scroll terbesar). Rel yang lebih panjang
+ * dari batas itu bergeser sedikit lebih cepat.
+ */
 function hitungSpanOtomatis(akar: HTMLElement) {
   akar.querySelectorAll<HTMLElement>('[data-sc-act="pan"][data-span-otomatis]').forEach((act) => {
     const rel = act.querySelector<HTMLElement>("[data-sc-pan]");
     if (!rel) return;
-    const geseran = Math.max(rel.scrollWidth - innerWidth, 0);
-    act.dataset.scSpan = (1 + (geseran * SCROLL_PER_GESERAN) / innerHeight).toFixed(2);
+    const span = 1 + (geseranRel(rel) * SCROLL_PER_GESERAN) / innerHeight;
+    const maks = parseFloat(act.dataset.spanMaks ?? "") || Infinity;
+    act.dataset.scSpan = Math.min(span, maks).toFixed(2);
   });
 }
 
@@ -47,6 +53,8 @@ export function useMesinScroll(akar: RefObject<HTMLElement | null>, terbuka: boo
     if (!terbuka) return;
     let instans: InstansScrollCraft | undefined;
     let lepasLentera: (() => void) | undefined;
+    let lepasFokusRel: (() => void) | undefined;
+    let lepasMuatAwal: (() => void) | undefined;
     let pengatur: ReturnType<typeof setTimeout> | undefined;
     let lebarTerakhir = innerWidth;
     let batal = false;
@@ -58,9 +66,13 @@ export function useMesinScroll(akar: RefObject<HTMLElement | null>, terbuka: boo
       else hitungSpanOtomatis(el);
       instans = engine.mount(el);
       lepasLentera = pasangLenteraStasiun(el);
+      lepasMuatAwal = pasangMuatAwalRel(el);
+      if (!engine.reduce) lepasFokusRel = pasangFokusRel(el);
     };
     const lepas = () => {
       lepasLentera?.();
+      lepasMuatAwal?.();
+      lepasFokusRel?.();
       instans?.destroy();
     };
 

@@ -199,6 +199,13 @@ Periksa kedua lembar sebelum dipakai. Untuk foto baru:
   - Pola panel melayang (`.simpan-tanggal__pilihan`) untuk pilihan yang tidak boleh menambah tinggi act.
   - Elemen tanpa media ikut menyala lewat opasitas yang digerakkan `data-menyala` (angka hitung mundur).
   - Harness `alat/verifikasi.mjs` juga mengukur teks di dalam `role="timer"`.
+- **Sudah ada sejak tiket 07** (Kenangan, `id="kenangan"`):
+  - `data-span-maks` membatasi span otomatis act `pan` (Kenangan 2.4, supaya Hero tetap terpanjang). Rel yang lebih panjang bergeser sedikit lebih cepat.
+  - `src/komponen/rel-pan.ts` (kode halaman, bukan engine), untuk semua act `pan` termasuk Kisah Cinta:
+    - fokus keyboard (`:focus-visible`) di rel menggulir halaman ke progres yang membawa elemen itu ke tengah layar;
+    - foto rel dimuat saat act-nya 1,5 layar lagi, karena panggung `overflow: clip` membuat lazy loading bawaan terlambat.
+  - Rel yang lebih pendek dari layar ditaruh di tengah (`justify-content: safe center`).
+  - Lightbox galeri berada di dalam panggung act `pan`, bukan di act `flow` seperti kalimat spec Modul 4. Ini disengaja: rel tetap markup server, klik ditangkap pembungkus `display: contents`, dan `<dialog>` modal tampil di top layer, jadi posisi dan transform panggung tidak berpengaruh.
 - **08–10**: act `flow` biasa, sudah sesuai score (Hadir). Lentera tamu digantung saat RSVP berhasil (bisa disusulkan di tiket 15).
 - **15**: untaian lentera, penutup, ukur panjang total, Step 5 penuh, feel check terhadap BRIEF, lalu tambahkan baris fingerprint.
   - Juga **lantai yang menghangat** (§3.3): `--terang` = jumlah stasiun ber-`data-menyala` dibagi jumlah stasiun, canvas bertahap dari `#0E0B09` ke `#1A130D`. Dibuat di tiket 15 karena baru bermakna setelah semua stasiun ada; pemicunya (`data-menyala`) sudah ada di `lentera-stasiun.ts`.

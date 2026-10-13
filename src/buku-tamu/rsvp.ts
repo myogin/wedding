@@ -6,6 +6,9 @@ import { PANJANG_MAKS_NAMA_TAMU } from "../tamu/konteks-tamu";
 export const KEHADIRAN = ["hadir", "tidak_hadir"] as const;
 export type Kehadiran = (typeof KEHADIRAN)[number];
 
+/** Label kehadiran yang dilihat Tamu, di pilihan form maupun di Buku Tamu. */
+export const LABEL_KEHADIRAN: Record<Kehadiran, string> = { hadir: "Hadir", tidak_hadir: "Tidak Hadir" };
+
 /** Sama dengan batas nama dari Link Tamu, jadi nama yang terisi otomatis selalu muat. */
 export const PANJANG_MAKS_NAMA = PANJANG_MAKS_NAMA_TAMU;
 export const PANJANG_MAKS_UCAPAN = 500;

@@ -191,7 +191,6 @@ test.describe("RSVP", () => {
 
     await form.getByRole("radio", { name: "Hadir", exact: true }).check();
     await form.getByLabel("Jumlah orang").selectOption(`${batasPax} orang`);
-    await form.getByLabel("Ucapan dan doa").fill("Selamat menempuh hidup baru!");
     await form.getByRole("button", { name: "Konfirmasi Kehadiran" }).click();
 
     const pesan = hadir(page).getByText("Terima kasih, Budi Santoso.");
@@ -228,5 +227,149 @@ test.describe("RSVP", () => {
     // Form tetap bisa dipakai (mis. untuk anggota keluarga lain), dan penandanya ikut terbaca bersama form.
     await expect(formRsvp(page)).toHaveAccessibleDescription(/sudah mengirim konfirmasi/);
     await expect(formRsvp(page).getByLabel("Nama")).toHaveValue("Budi Santoso");
+  });
+});
+
+test.describe("Buku Tamu", () => {
+  function bukuTamu(page: Page) {
+    return hadir(page).getByRole("region", { name: "Buku Tamu" });
+  }
+
+  /** Isi Ucapan di halaman Buku Tamu yang sedang tampil, berurutan dari atas. */
+  async function isiUcapan(page: Page) {
+    await expect(bukuTamu(page)).toHaveAttribute("aria-busy", "false");
+    return bukuTamu(page).getByRole("blockquote").allTextContents();
+  }
+
+  // Proyek ponsel dan desktop mengirim Ucapan ke database yang sama secara paralel, jadi Ucapan tes ini
+  // diperiksa berada di atas Ucapan yang sudah teratas sebelum dikirim, bukan harus di baris pertama.
+  test("setelah RSVP dikirim dengan Ucapan, pesan sukses tampil, Ucapan muncul paling atas, dan ringkasan bertambah", async ({
+    page,
+  }, info) => {
+    await bukaRsvp(page);
+    const [teratasSebelum] = await isiUcapan(page);
+    const ringkasanSebelum = await bacaRingkasan(page);
+    const ucapan = `Selamat berbahagia, semoga langgeng (${info.project.name} ${Date.now()})`;
+    const form = formRsvp(page);
+
+    await form.getByRole("radio", { name: "Tidak Hadir" }).check();
+    await form.getByLabel("Ucapan dan doa").fill(ucapan);
+    await form.getByRole("button", { name: "Konfirmasi Kehadiran" }).click();
+
+    await expect(hadir(page).getByText("Terima kasih, Budi Santoso.")).toBeVisible();
+    await expect(bukuTamu(page).getByRole("blockquote").filter({ hasText: ucapan })).toBeVisible();
+    await expect
+      .poll(async () => (await bacaRingkasan(page)).respons)
+      .toBeGreaterThanOrEqual(ringkasanSebelum.respons + 1);
+    const sesudah = await isiUcapan(page);
+    const posisi = sesudah.indexOf(ucapan);
+    expect(posisi).toBeGreaterThanOrEqual(0);
+    if (teratasSebelum !== undefined) expect(posisi).toBeLessThan(sesudah.indexOf(teratasSebelum));
+  });
+
+  const SEKARANG = new Date("2026-10-15T10:00:00Z").getTime();
+  const MENIT = 60_000;
+
+  /** Ucapan contoh, `menitLalu` sebelum SEKARANG. */
+  const ucapanContoh = (nama: string, menitLalu: number, kehadiran = "hadir") => ({
+    nama,
+    kehadiran,
+    ucapan: `Ucapan dari ${nama}`,
+    dibuat: new Date(SEKARANG - menitLalu * MENIT).toISOString(),
+  });
+
+  /** Menggantikan GET /api/wishes dengan halaman-halaman tetap (indeks 0 = halaman 1). */
+  async function tirukanBukuTamu(page: Page, halaman: ReturnType<typeof ucapanContoh>[][]) {
+    await page.route(
+      (url) => url.pathname === "/api/wishes",
+      (route) => {
+        const nomor = Number(new URL(route.request().url()).searchParams.get("page") ?? "1");
+        route.fulfill({
+          json: { item: halaman[nomor - 1] ?? [], halaman: nomor, totalHalaman: Math.max(1, halaman.length) },
+        });
+      },
+    );
+  }
+
+  test("setiap Ucapan menampilkan nama, status kehadiran, isi, dan waktu relatif", async ({ page }) => {
+    await page.clock.setFixedTime(SEKARANG);
+    await tirukanBukuTamu(page, [
+      [ucapanContoh("Siti", 0.5), ucapanContoh("Andi", 120, "tidak_hadir"), ucapanContoh("Dewi", 3 * 24 * 60)],
+    ]);
+    await bukaRsvp(page);
+    const item = bukuTamu(page).getByRole("listitem");
+
+    await expect(item).toHaveCount(3);
+    await expect(item.nth(0)).toContainText("Siti");
+    await expect(item.nth(0)).toContainText("Hadir");
+    await expect(item.nth(0)).toContainText("baru saja");
+    await expect(item.nth(0).getByRole("blockquote")).toHaveText("Ucapan dari Siti");
+    await expect(item.nth(1)).toContainText("Tidak Hadir");
+    await expect(item.nth(1)).toContainText("2 jam lalu");
+    await expect(item.nth(2)).toContainText("3 hari lalu");
+  });
+
+  test("tombol Sebelumnya dan Berikutnya berpindah halaman", async ({ page }) => {
+    await tirukanBukuTamu(page, [
+      Array.from({ length: 10 }, (_, i) => ucapanContoh(`Tamu ${i + 1}`, i + 1)),
+      [ucapanContoh("Tamu 11", 11)],
+    ]);
+    await bukaRsvp(page);
+    const buku = bukuTamu(page);
+    const sebelumnya = buku.getByRole("button", { name: "Sebelumnya" });
+    const berikutnya = buku.getByRole("button", { name: "Berikutnya" });
+
+    await expect(buku.getByText("Halaman 1 dari 2", { exact: true })).toBeVisible();
+    await expect(sebelumnya).toBeDisabled();
+    await berikutnya.click();
+
+    await expect(buku.getByText("Halaman 2 dari 2", { exact: true })).toBeVisible();
+    await expect(buku.getByRole("blockquote")).toHaveText(["Ucapan dari Tamu 11"]);
+    await expect(berikutnya).toBeDisabled();
+    // Fokus pindah ke judul, yang menyebut halamannya, jadi halaman baru dibaca dari atas.
+    const judul = buku.getByRole("heading", { name: "Buku Tamu" });
+    await expect(judul).toBeFocused();
+    await expect(judul).toHaveAccessibleName(/^Buku Tamu\s+halaman 2 dari 2$/);
+
+    await sebelumnya.click();
+    await expect(buku.getByText("Halaman 1 dari 2", { exact: true })).toBeVisible();
+    await expect(buku.getByRole("blockquote").first()).toHaveText("Ucapan dari Tamu 1");
+  });
+
+  test("setelah RSVP terkirim, Buku Tamu kembali ke halaman 1", async ({ page }) => {
+    await tirukanBukuTamu(page, [[ucapanContoh("Tamu 1", 1)], [ucapanContoh("Tamu 2", 2)]]);
+    await page.route("/api/rsvp", (route) =>
+      route.fulfill({ status: 201, json: { nama: "Budi Santoso", kehadiran: "tidak_hadir" } }),
+    );
+    await bukaRsvp(page);
+    const buku = bukuTamu(page);
+    await buku.getByRole("button", { name: "Berikutnya" }).click();
+    await expect(buku.getByText("Halaman 2 dari 2", { exact: true })).toBeVisible();
+
+    await formRsvp(page).getByRole("radio", { name: "Tidak Hadir" }).check();
+    await formRsvp(page).getByRole("button", { name: "Konfirmasi Kehadiran" }).click();
+
+    await expect(buku.getByText("Halaman 1 dari 2", { exact: true })).toBeVisible();
+    await expect(buku.getByRole("blockquote")).toHaveText(["Ucapan dari Tamu 1"]);
+  });
+
+  test("bila halaman berikutnya gagal dimuat, Tamu diberi tahu dan halaman lama tetap tampil", async ({ page }) => {
+    await tirukanBukuTamu(page, [[ucapanContoh("Tamu 1", 1)], [ucapanContoh("Tamu 2", 2)]]);
+    await bukaRsvp(page);
+    await page.route("/api/wishes?page=2", (route) => route.fulfill({ status: 500 }));
+    const buku = bukuTamu(page);
+
+    await buku.getByRole("button", { name: "Berikutnya" }).click();
+
+    await expect(buku.getByRole("status")).toHaveText("Halaman itu belum bisa dimuat. Coba lagi.");
+    await expect(buku.getByRole("blockquote")).toHaveText(["Ucapan dari Tamu 1"]);
+  });
+
+  test("tanpa Ucapan, Buku Tamu mengajak Tamu menitipkan doa pertama", async ({ page }) => {
+    await tirukanBukuTamu(page, []);
+    await bukaRsvp(page);
+
+    await expect(bukuTamu(page).getByText("Belum ada Ucapan.")).toBeVisible();
+    await expect(bukuTamu(page).getByRole("navigation")).toHaveCount(0);
   });
 });

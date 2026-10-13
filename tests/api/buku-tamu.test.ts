@@ -1,16 +1,24 @@
 import { sql } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import type { HalamanUcapan } from "@/buku-tamu/ucapan";
 import { buatDb } from "@/db";
 import { parseKontenUndangan } from "@/konten/parse";
 import { kontenMentah } from "@/konten/undangan";
 import { buatBukuTamuHandler } from "@/server/api-buku-tamu";
 import { URL_DB_TES } from "../db-tes";
 
+const SEKARANG = new Date("2026-10-13T04:30:00Z");
+const MENIT = 60_000;
+
+/** Jam yang disuntikkan ke handler. Tetap, kecuali dimajukan tes. */
+let jam = SEKARANG;
+
 const koneksi = buatDb(URL_DB_TES);
 afterAll(() => koneksi.tutup());
-beforeEach(() => koneksi.db.execute(sql`truncate table rsvp`));
-
-const SEKARANG = new Date("2026-10-13T04:30:00Z");
+beforeEach(async () => {
+  jam = SEKARANG;
+  await koneksi.db.execute(sql`truncate table rsvp`);
+});
 
 /** Konten fixture: dua Acara dan Batas Pax 3. */
 const kontenUndangan = parseKontenUndangan({
@@ -37,7 +45,7 @@ const kontenUndangan = parseKontenUndangan({
   rsvp: { batasWaktu: "2026-11-01T23:59:00+07:00", batasPax: 3, tampilkanRingkasan: true },
 });
 
-const api = buatBukuTamuHandler({ db: koneksi.db, sekarang: () => SEKARANG, kontenUndangan });
+const api = buatBukuTamuHandler({ db: koneksi.db, sekarang: () => jam, kontenUndangan });
 
 function kirimRsvp(body: unknown) {
   return api.kirimRsvp(
@@ -182,5 +190,79 @@ describe("GET /api/rsvp/summary", () => {
     });
 
     expect((await tanpaRingkasan.ringkasanRsvp()).status).toBe(404);
+  });
+});
+
+describe("GET /api/wishes", () => {
+  async function daftarUcapan(query = ""): Promise<HalamanUcapan> {
+    const res = await api.daftarUcapan(new Request(`http://undangan.test/api/wishes${query}`));
+    expect(res.status).toBe(200);
+    return res.json();
+  }
+
+  /** Mengirim RSVP berisi Ucapan satu per satu, masing-masing semenit setelah yang sebelumnya. */
+  async function kirimUcapanBerurutan(jumlah: number) {
+    for (let i = 1; i <= jumlah; i++) {
+      jam = new Date(SEKARANG.getTime() + i * MENIT);
+      await kirimRsvp({ ...rsvpHadir, nama: `Tamu ${i}`, ucapan: `Ucapan ${i}` });
+    }
+  }
+
+  it("Ucapan tampil terbaru dulu, 10 per halaman", async () => {
+    await kirimUcapanBerurutan(12);
+
+    const halaman1 = await daftarUcapan("?page=1");
+    expect(halaman1).toMatchObject({ halaman: 1, totalHalaman: 2 });
+    expect(halaman1.item.map((u) => u.nama)).toEqual(
+      [12, 11, 10, 9, 8, 7, 6, 5, 4, 3].map((i) => `Tamu ${i}`),
+    );
+
+    const halaman2 = await daftarUcapan("?page=2");
+    expect(halaman2).toMatchObject({ halaman: 2, totalHalaman: 2 });
+    expect(halaman2.item.map((u) => u.nama)).toEqual(["Tamu 2", "Tamu 1"]);
+  });
+
+  it("setiap Ucapan berisi nama, kehadiran, isi, dan waktu dibuat saja", async () => {
+    await kirimRsvp({ nama: "Andi", kehadiran: "tidak_hadir", ucapan: "Maaf belum bisa hadir, selamat ya!" });
+
+    expect(await daftarUcapan()).toEqual({
+      item: [
+        {
+          nama: "Andi",
+          kehadiran: "tidak_hadir",
+          ucapan: "Maaf belum bisa hadir, selamat ya!",
+          dibuat: "2026-10-13T04:30:00.000Z",
+        },
+      ],
+      halaman: 1,
+      totalHalaman: 1,
+    });
+  });
+
+  it("RSVP tanpa Ucapan tidak masuk daftar, tetapi tetap dihitung di ringkasan", async () => {
+    await kirimRsvp({ ...rsvpHadir, nama: "Siti", ucapan: "Bahagia selalu" });
+    await kirimRsvp({ ...rsvpHadir, nama: "Andi", ucapan: undefined });
+    await kirimRsvp({ ...rsvpHadir, nama: "Dewi", ucapan: "   " });
+
+    const { item } = await daftarUcapan();
+    expect(item.map((u) => u.nama)).toEqual(["Siti"]);
+    expect(await (await api.ringkasanRsvp()).json()).toMatchObject({ totalRespons: 3, hadir: 3 });
+  });
+
+  it("tanpa Ucapan sama sekali, daftar kosong dengan satu halaman", async () => {
+    expect(await daftarUcapan()).toEqual({ item: [], halaman: 1, totalHalaman: 1 });
+  });
+
+  it("halaman sesudah halaman terakhir berisi kosong", async () => {
+    await kirimUcapanBerurutan(3);
+
+    expect(await daftarUcapan("?page=2")).toEqual({ item: [], halaman: 2, totalHalaman: 1 });
+  });
+
+  it("menolak nomor halaman yang bukan bilangan bulat mulai dari 1", async () => {
+    for (const page of ["0", "-1", "1.5", "abc", ""]) {
+      const res = await api.daftarUcapan(new Request(`http://undangan.test/api/wishes?page=${page}`));
+      expect(res.status, `page=${page}`).toBe(400);
+    }
   });
 });

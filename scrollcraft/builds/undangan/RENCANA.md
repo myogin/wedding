@@ -212,5 +212,9 @@ Periksa kedua lembar sebelum dipakai. Untuk foto baru:
   - Pola isian form (`.isian`, `.pilihan`) dan label kecil berhuruf kapital yang dipakai bersama hitung mundur.
   - Penanda RSVP di `localStorage` `undangan:rsvp` = `{ nama, kehadiran }`. Lentera tamu membacanya.
   - `mesin-scroll.ts` memanggil `layout()` engine setiap kali tinggi akar Undangan berubah, jadi act ber-pin sesudah Hadir (penutup) tetap tepat walau form memanjang atau memendek. Tiket 15 perlu mengujinya lewat pin penutup.
+- **Sudah ada sejak tiket 09** (Buku Tamu di act Hadir):
+  - `IsiHadir` (`src/komponen/isi-hadir.tsx`) menyusun ringkasan, RSVP, dan Buku Tamu sebagai tiga anak grid act Hadir. Amplop Digital (tiket 10) bisa menjadi anak keempat.
+  - Buku Tamu ±1.9 layar per halaman di ponsel, jadi act Hadir ±3 layar. Tiket 15 menimbangnya saat mengukur panjang total.
+  - `LABEL_KEHADIRAN` (`src/buku-tamu/rsvp.ts`) untuk label "Hadir"/"Tidak Hadir" di mana pun.
 - **15**: untaian lentera, penutup, ukur panjang total, Step 5 penuh, feel check terhadap BRIEF, lalu tambahkan baris fingerprint.
   - Juga **lantai yang menghangat** (§3.3): `--terang` = jumlah stasiun ber-`data-menyala` dibagi jumlah stasiun, canvas bertahap dari `#0E0B09` ke `#1A130D`. Dibuat di tiket 15 karena baru bermakna setelah semua stasiun ada; pemicunya (`data-menyala`) sudah ada di `lentera-stasiun.ts`.

@@ -1,14 +1,14 @@
 import { Suspense } from "react";
 import { aturanRsvp } from "@/buku-tamu/rsvp";
 import type { KontenUndangan } from "@/konten/skema";
-import { Rsvp } from "./rsvp";
+import { IsiHadir } from "./isi-hadir";
 
 type Props = Pick<KontenUndangan, "acara" | "rsvp">;
 
 /**
  * Act Hadir (RENCANA.md §5): `flow` + `in`, rata kiri. Ponsel: bertumpuk. Layar lebar: judul dan ringkasan
- * di kolom kiri, form di kanan. Untuk sementara hanya berisi RSVP; Buku Tamu dan Amplop Digital menyusul,
- * dan penempatan akhirnya dikerjakan di tiket 15.
+ * di kolom kiri, form di kanan, lalu Buku Tamu selebar act. Amplop Digital menyusul, dan penempatan akhirnya
+ * dikerjakan di tiket 15.
  */
 export function Hadir({ acara, rsvp }: Props) {
   return (
@@ -23,7 +23,7 @@ export function Hadir({ acara, rsvp }: Props) {
       </div>
       {/* Nama dari Link Tamu dibaca di browser. Selama itu layar loading sudah menutupi halaman. */}
       <Suspense fallback={null}>
-        <Rsvp
+        <IsiHadir
           acara={acara.map(({ id, nama }) => ({ id, nama }))}
           aturan={aturanRsvp({ acara, rsvp })}
           tampilkanRingkasan={rsvp.tampilkanRingkasan}

@@ -37,5 +37,17 @@ export function buatBukuTamuHandler(dependensi: DependensiBukuTamu) {
       if (!dependensi.kontenUndangan.rsvp.tampilkanRingkasan) return new Response(null, { status: 404 });
       return Response.json(await bukuTamu.ringkasan(), { headers: { "Cache-Control": "no-store" } });
     },
+
+    /**
+     * GET /api/wishes?page=n: Ucapan halaman n (bawaannya 1). 400 bila n bukan bilangan bulat 1..999999
+     * (batas atas mencegah offset raksasa; halaman sejauh itu toh kosong).
+     */
+    async daftarUcapan(request: Request): Promise<Response> {
+      const page = new URL(request.url).searchParams.get("page") ?? "1";
+      if (!/^[1-9]\d{0,5}$/.test(page)) {
+        return Response.json({ galat: "page harus bilangan bulat mulai dari 1" }, { status: 400 });
+      }
+      return Response.json(await bukuTamu.daftarUcapan(Number(page)), { headers: { "Cache-Control": "no-store" } });
+    },
   };
 }

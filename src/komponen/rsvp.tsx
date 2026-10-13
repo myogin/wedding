@@ -1,10 +1,12 @@
 "use client";
 
+// RSVP: form Konfirmasi Kehadiran, pesan suksesnya, dan penanda "sudah mengirim" di perangkat ini.
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { flushSync } from "react-dom";
 import {
   KEHADIRAN,
+  LABEL_KEHADIRAN,
   PANJANG_MAKS_NAMA,
   PANJANG_MAKS_UCAPAN,
   periksaRsvp,
@@ -12,17 +14,10 @@ import {
   type FieldRsvp,
   type GalatRsvp,
   type Kehadiran,
-  type RingkasanRsvp,
 } from "@/buku-tamu/rsvp";
 import { bacaKonteksTamu } from "@/tamu/konteks-tamu";
 
-type AcaraPilihan = { id: string; nama: string };
-
-type Props = {
-  acara: AcaraPilihan[];
-  aturan: AturanRsvp;
-  tampilkanRingkasan: boolean;
-};
+export type AcaraPilihan = { id: string; nama: string };
 
 /** Penanda "sudah mengirim" di perangkat ini. Lentera tamu (tiket 15) memakai nama yang sama. */
 type CatatanKirim = { nama: string; kehadiran: Kehadiran };
@@ -49,37 +44,19 @@ function simpanCatatan(catatan: CatatanKirim) {
   }
 }
 
-/** Ringkasan dari server. null selama dimuat, "gagal" bila belum pernah berhasil dimuat. */
-function useRingkasan(aktif: boolean) {
-  const [ringkasan, setRingkasan] = useState<RingkasanRsvp | "gagal" | null>(null);
-
-  const muat = useCallback(async () => {
-    try {
-      const res = await fetch("/api/rsvp/summary", { cache: "no-store" });
-      if (!res.ok) throw new Error(String(res.status));
-      setRingkasan(await res.json());
-    } catch {
-      // Angka lama (bila ada) tetap tampil daripada hilang.
-      setRingkasan((lama) => lama ?? "gagal");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (aktif) void muat();
-  }, [aktif, muat]);
-
-  return [ringkasan, muat] as const;
-}
+type PropsRsvp = {
+  acara: AcaraPilihan[];
+  aturan: AturanRsvp;
+  /** RSVP baru saja tersimpan (mis. supaya ringkasan dan Buku Tamu dimuat ulang). */
+  onTerkirim(): void;
+};
 
 /**
- * RSVP di act Hadir: ringkasan kehadiran (bila diaktifkan) dan form Konfirmasi Kehadiran. Setelah terkirim,
- * form diganti pesan sukses. Saat Tamu kembali di perangkat yang sama, penanda "sudah mengirim" tampil di atas
- * form, dan form tetap bisa dipakai (mis. untuk anggota keluarga lain).
- * Dirender sebagai dua anak grid act: ringkasan di kolom kiri dan form di kolom kanan.
+ * RSVP di act Hadir. Setelah terkirim, form diganti pesan sukses. Saat Tamu kembali di perangkat yang sama,
+ * penanda "sudah mengirim" tampil di atas form, dan form tetap bisa dipakai (mis. untuk anggota keluarga lain).
  */
-export function Rsvp({ acara, aturan, tampilkanRingkasan }: Props) {
+export function Rsvp({ acara, aturan, onTerkirim }: PropsRsvp) {
   const { namaTamu } = bacaKonteksTamu(useSearchParams());
-  const [ringkasan, muatUlangRingkasan] = useRingkasan(tampilkanRingkasan);
   /** Kiriman dari kunjungan sebelumnya di perangkat ini. */
   const [sudahMengirim, setSudahMengirim] = useState<CatatanKirim | null>(null);
   /** Kiriman pada kunjungan ini. */
@@ -92,72 +69,26 @@ export function Rsvp({ acara, aturan, tampilkanRingkasan }: Props) {
   function padaTerkirim(catatan: CatatanKirim) {
     simpanCatatan(catatan);
     setTerkirim(catatan);
-    if (tampilkanRingkasan) void muatUlangRingkasan();
+    onTerkirim();
   }
 
+  if (terkirim) return <RsvpTerkirim {...terkirim} />;
   return (
     <>
-      {tampilkanRingkasan && (
-        <div className="hadir__ringkasan" data-sc-in="">
-          <RingkasanKehadiran ringkasan={ringkasan} />
-        </div>
+      {sudahMengirim && (
+        <p id="rsvp-sudah-mengirim" className="rsvp__sudah-mengirim">
+          Kamu sudah mengirim konfirmasi sebagai {sudahMengirim.nama}. Kirim lagi hanya bila ada yang berubah, atau
+          untuk orang lain.
+        </p>
       )}
-      {/* Pembungkus tetap ada saat isinya berganti, karena engine hanya mengamati [data-sc-in] saat dipasang. */}
-      <div className="hadir__rsvp" data-sc-in="">
-        {terkirim ? (
-          <RsvpTerkirim {...terkirim} />
-        ) : (
-          <>
-            {sudahMengirim && (
-              <p id="rsvp-sudah-mengirim" className="rsvp__sudah-mengirim">
-                Kamu sudah mengirim konfirmasi sebagai {sudahMengirim.nama}. Kirim lagi hanya bila ada yang berubah,
-                atau untuk orang lain.
-              </p>
-            )}
-            <FormRsvp
-              acara={acara}
-              aturan={aturan}
-              namaAwal={namaTamu ?? ""}
-              keterangan={sudahMengirim ? "rsvp-sudah-mengirim" : undefined}
-              onTerkirim={padaTerkirim}
-            />
-          </>
-        )}
-      </div>
+      <FormRsvp
+        acara={acara}
+        aturan={aturan}
+        namaAwal={namaTamu ?? ""}
+        keterangan={sudahMengirim ? "rsvp-sudah-mengirim" : undefined}
+        onTerkirim={padaTerkirim}
+      />
     </>
-  );
-}
-
-const formatAngka = new Intl.NumberFormat("id-ID");
-/** Lebar satu angka (figure space) selama ringkasan dimuat, supaya tingginya sudah tercadang. */
-const ANGKA_KOSONG = " ";
-
-function RingkasanKehadiran({ ringkasan }: { ringkasan: RingkasanRsvp | "gagal" | null }) {
-  const angka = typeof ringkasan === "object" ? ringkasan : null;
-  const butir: [string, number | undefined][] = [
-    ["Total respons", angka?.totalRespons],
-    ["Hadir", angka?.hadir],
-    ["Tidak hadir", angka?.tidakHadir],
-    ["Total tamu", angka?.totalPax],
-  ];
-
-  return (
-    <div
-      className="ringkasan"
-      role="group"
-      aria-label="Ringkasan konfirmasi"
-      aria-busy={ringkasan === null}
-      data-gagal={ringkasan === "gagal" || undefined}
-    >
-      <dl className="ringkasan__daftar">
-        {butir.map(([label, nilai]) => (
-          <div key={label} className="ringkasan__butir">
-            <dt className="ringkasan__label">{label}</dt>
-            <dd className="ringkasan__angka">{nilai === undefined ? ANGKA_KOSONG : formatAngka.format(nilai)}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
   );
 }
 
@@ -281,12 +212,7 @@ function FormRsvp({ acara, aturan, namaAwal, keterangan, onTerkirim }: PropsForm
       <fieldset className="isian" aria-describedby={galat.kehadiran ? idGalat("kehadiran") : undefined}>
         <legend className="isian__label">Kehadiran</legend>
         <div className="pilihan">
-          {(
-            [
-              ["hadir", "Hadir"],
-              ["tidak_hadir", "Tidak Hadir"],
-            ] as const
-          ).map(([nilai, label], i) => (
+          {KEHADIRAN.map((nilai, i) => (
             <label key={nilai} className="pilihan__opsi">
               <input
                 ref={(el) => {
@@ -302,7 +228,7 @@ function FormRsvp({ acara, aturan, namaAwal, keterangan, onTerkirim }: PropsForm
                   hapusGalat("kehadiran");
                 }}
               />
-              <span>{label}</span>
+              <span>{LABEL_KEHADIRAN[nilai]}</span>
             </label>
           ))}
         </div>

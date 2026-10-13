@@ -1120,12 +1120,18 @@ html:has(.undangan:not([data-terbuka])) {
   transform: scale(0.97);
 }
 
+.tombol-garis:disabled {
+  opacity: 0.4;
+  transform: none;
+  cursor: default;
+}
+
 .tombol-garis[aria-expanded="true"] {
   border-color: var(--sc-accent);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .tombol-garis:hover {
+  .tombol-garis:not(:disabled):hover {
     border-color: var(--sc-accent);
   }
 }
@@ -1735,6 +1741,85 @@ legend.isian__label {
   line-height: 1.6;
 }
 
+/* Buku Tamu: Ucapan dipisah garis rambut. Layar lebar: selebar act, dua kolom yang terisi per baris
+   (terbaru di kiri atas, lalu ke kanan), jadi urutan terbaru dulu tetap terbaca. */
+.hadir__buku-tamu {
+  min-width: 0;
+}
+
+.buku-tamu {
+  display: grid;
+  gap: var(--sc-5);
+}
+
+.buku-tamu__judul {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: var(--sc-t-xl);
+  line-height: 1.1;
+}
+
+.buku-tamu__catatan {
+  margin: 0;
+  color: var(--sc-ink-soft);
+}
+
+.buku-tamu__daftar {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ucapan {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: var(--sc-4) 0;
+  border-top: 1px solid var(--sc-hairline);
+}
+
+.ucapan__nama {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  line-height: 1.2;
+}
+
+.ucapan__meta {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+
+/* Baris baru dari Tamu dipertahankan; kata yang sangat panjang dipatahkan supaya tidak meluap. */
+.ucapan__isi {
+  max-width: 60ch;
+  margin: var(--sc-2) 0 0;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.buku-tamu__halaman {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-4);
+  padding-top: var(--sc-5);
+  border-top: 1px solid var(--sc-hairline);
+}
+
+.buku-tamu__posisi {
+  margin: 0;
+  color: var(--sc-ink-soft);
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+
 @media (min-width: 600px) {
   .tombol-utama {
     justify-self: start;
@@ -1767,6 +1852,21 @@ legend.isian__label {
   .hadir__rsvp {
     grid-column: 2;
     grid-row: 1 / span 2;
+  }
+
+  .hadir__buku-tamu {
+    grid-column: 1 / -1;
+    margin-top: var(--sc-6);
+  }
+
+  .buku-tamu__daftar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(3rem, 7vw, 8rem);
+  }
+
+  .ucapan {
+    padding-block: var(--sc-5);
   }
 }
 

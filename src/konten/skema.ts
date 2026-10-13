@@ -17,6 +17,11 @@ const skemaGambar = z.object({
   alt: z.string().min(1),
   lebar: z.number().int().positive(),
   tinggi: z.number().int().positive(),
+  /**
+   * Titik yang harus tetap terlihat saat foto dipotong ke bingkai lain (0..1 dari kiri dan dari atas).
+   * Bawaannya tengah. Mis. { x: 1, y: 0.5 } memotong dari kiri saja.
+   */
+  fokus: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).optional(),
 });
 
 const skemaMempelai = z.object({
@@ -84,7 +89,10 @@ export const skemaKontenUndangan = z
       salam: z.string().min(1),
       gambar: skemaGambar.optional(),
       kutipan: z.object({
+        /** Satu baris per baris ayat, dipisah "\n". */
         teksAsli: z.string().min(1).optional(),
+        /** Kode bahasa BCP 47 teks asli untuk pembaca layar, mis. "sa-Latn" atau "ar". */
+        bahasaAsli: z.string().min(2).optional(),
         terjemahan: z.string().min(1),
         sumber: z.string().min(1),
       }),

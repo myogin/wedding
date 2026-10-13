@@ -33,7 +33,7 @@ Nama, foto, dan musik di bawah adalah Placeholder dari website referensi. Brief 
    6. Hadir
    7. Terima kasih
 
-   Kisah cinta tidak ada di konten Placeholder, jadi tidak punya bagian sendiri.
+   Kisah cinta tidak ada di konten Placeholder, jadi saat ini tidak tampil. *(didelegasikan, tiket 05)* Bila Mempelai mengisinya, kisah cinta tampil sebagai act opsional sesudah Kami, bagian dari stasiun Kami (spec: "Kami. Mempelai dan kisah cinta").
 
 3. **Energi** *(didelegasikan)*:
    - Sunyi di Sampul.
@@ -89,6 +89,7 @@ Satu baris per tahap: emosinya dulu, lalu penyebabnya di layar.
 | 1 | Gerbang | **Takjub** (peak) | Kamu menekan Buka Undangan, lentera menyala satu per satu, lalu saat di-scroll lorongnya berlapis dan Mempelai seperti melangkah ke arahmu. |
 | 2 | Restu | **Khidmat** | Hampir hitam. Ayat datang baris demi baris, lalu artinya. Tidak ada yang bergerak selain teks. |
 | 3 | Kami | **Akrab** | Dua potret dibuka dari dua sisi, dekat. Nama lengkap, orang tua, Instagram. |
+| 3b | Kisah Cinta *(opsional, didelegasikan)* | **Tersentuh** | Babak-babak perjalanan mereka digeser menyamping seperti menyusuri waktu. Hanya ada bila `kisahCinta` diisi. |
 | 4 | Hari H | **Yakin** | Hitung mundur yang sungguh berdetak, tanggal, jam dengan WITA, satu ketukan ke peta dan kalender. |
 | 5 | Kenangan | **Gembira** | Berjalan menyamping menyusuri ruangan-ruangan villa, foto demi foto. |
 | 6 | Hadir | **Ikut serta** | Kata-katamu bergabung dengan ucapan tamu lain. Begitu kamu konfirmasi, lenteramu digantung. |

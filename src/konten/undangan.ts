@@ -27,7 +27,14 @@ export const kontenMentah = {
       ayah: "A A Gede Anom Sukawati, SE",
       ibu: "Jero Kartika Sari",
       instagram: "https://www.instagram.com/gungdde_",
-      foto: { src: "/placeholder/mempelai-pria.jpg", alt: "Agung Dalem", lebar: 1575, tinggi: 2100 },
+      // Fokus ke kanan: foto Placeholder ini punya tepi putih di sisi kiri.
+      foto: {
+        src: "/placeholder/mempelai-pria.jpg",
+        alt: "Agung Dalem",
+        lebar: 1575,
+        tinggi: 2100,
+        fokus: { x: 1, y: 0.5 },
+      },
     },
   },
 
@@ -59,6 +66,7 @@ export const kontenMentah = {
         "sam mātariśvā sam dhātā",
         "sam u deṣṭrī dadhātu nau",
       ].join("\n"),
+      bahasaAsli: "sa-Latn",
       terjemahan:
         "Tetaplah bersama di sini, jangan pernah terpisah; jalanilah seluruh hidup kalian bersama-sama. " +
         "Bermain bersama anak dan cucu, berbahagialah kalian berdua di rumah kalian sendiri. " +

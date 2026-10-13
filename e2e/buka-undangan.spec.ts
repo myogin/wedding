@@ -1,15 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { bukaUndangan, sampul } from "./bantuan";
 
 const ASET_HERO = "**/placeholder/hero/";
-
-function sampul(page: Page) {
-  return page.getByRole("region", { name: "Sampul" });
-}
-
-async function bukaUndangan(page: Page) {
-  await sampul(page).getByRole("button", { name: "Buka Undangan" }).click();
-  await expect(sampul(page)).toBeHidden();
-}
 
 function posisiScroll(page: Page) {
   return page.evaluate(() => window.scrollY);

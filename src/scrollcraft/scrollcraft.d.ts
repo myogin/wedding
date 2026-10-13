@@ -4,7 +4,7 @@
 
 export {};
 
-type InstansScrollCraft = {
+export type InstansScrollCraft = {
   layout(): void;
   read(): void;
   destroy(): void;

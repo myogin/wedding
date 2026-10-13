@@ -4,7 +4,7 @@ Rencana halaman hasil tahap perencanaan scroll-craft (tiket 03). Brief, feeling 
 
 ## 1. Journey
 
-Usulan spec dipakai, tanpa kisah cinta karena kontennya tidak ada.
+Usulan spec dipakai. Kisah cinta adalah bagian opsional dari stasiun Kami (3b, tiket 05): konten Placeholder tidak punya kisah cinta, jadi saat ini tidak tampil.
 
 | # | Tahap | Yang berubah pada tamu |
 |---|---|---|
@@ -12,6 +12,7 @@ Usulan spec dipakai, tanpa kisah cinta karena kontennya tidak ada.
 | 1 | Gerbang | Melihat siapa yang mengundang, dan merasakan acaranya |
 | 2 | Restu | Memahami makna pernikahan ini bagi mereka |
 | 3 | Kami | Mengenal kedua Mempelai dan keluarganya |
+| 3b | Kisah Cinta (opsional) | Mengenal perjalanan mereka sampai hari ini |
 | 4 | Hari H | Tahu kapan dan di mana, lalu bisa menyimpannya |
 | 5 | Kenangan | Ikut menikmati momen mereka |
 | 6 | Hadir | Konfirmasi, menulis ucapan, mengirim hadiah |
@@ -82,7 +83,7 @@ Baris yang direncanakan berikut ditambahkan ke registri **setelah halaman rampun
 
 | Build | Grammar | Nav treatment | Hero device | Act-sequence shape | Close pattern | Signature move | World | Port |
 |---|---|---|---|---|---|---|---|---|
-| undangan | Prosesi berlentera (baru) | Untaian lentera: satu lentera per stasiun, menyala saat tiba, bisa dilompati, plus kait lentera tamu | Penyalaan oleh ketukan, lalu dolly-in lapisan (latar/subjek/depan) dalam `pin`. Desktop berupa jendela cahaya tegak yang memudar ke gelap, ponsel full-bleed | 7 act: pin(3.0) · flow · pin+reveal(1.6) · flow · pan(2.4) · flow · pin+kinetic(1.4), ±13.3vh termasuk flow alami | Untaian penuh menyala, lentera bernama milik tamu paling terang, CTA = menyalakan lenteramu | Lentera tamu: RSVP menggantung lentera bernama tamu yang tetap menyala | Low-key cinematic, foto sendiri | Next.js 3000 / E2E 3100 |
+| undangan | Prosesi berlentera (baru) | Untaian lentera: satu lentera per stasiun, menyala saat tiba, bisa dilompati, plus kait lentera tamu | Penyalaan oleh ketukan, lalu dolly-in lapisan (latar/subjek/depan) dalam `pin`. Desktop berupa jendela cahaya tegak yang memudar ke gelap, ponsel full-bleed | 7 act: pin(3.0) · flow · pin+reveal(1.6) · flow · pan(2.4) · flow · pin+kinetic(1.4), ±13.3vh termasuk flow alami (8 act bila kisah cinta diisi: + pan otomatis sesudah Kami) | Untaian penuh menyala, lentera bernama milik tamu paling terang, CTA = menyalakan lenteramu | Lentera tamu: RSVP menggantung lentera bernama tamu yang tetap menyala | Low-key cinematic, foto sendiri | Next.js 3000 / E2E 3100 |
 
 ## 5. Score
 
@@ -91,6 +92,7 @@ Baris yang direncanakan berikut ditambahkan ke registri **setelah halaman rampun
 | 1 | Gerbang | `pin` + `parallax` (lapisan) + status cahaya | **3.0** | Desktop: kiri (kolom gelap di samping jendela cahaya). Ponsel: pita bawah | Peak. Perbedaan laju antarlapisan memberi kedalaman tanpa video, dan pin memberi ruang bagi kamera untuk "melangkah masuk". |
 | 2 | Restu | `flow` + `in` (baris ayat bergiliran 80 ms) | alami ±1.1 | **Tengah** (satu-satunya act rata tengah) | Khidmat butuh diam. Pin di sini akan terasa seperti menahan tamu, padahal yang diperlukan ruang bernapas. |
 | 3 | Kami | `pin` + `reveal` (potret pria dari kiri, wanita dari kanan) | 1.6 | Split: teks di sisi berlawanan dengan potretnya | Wipe adalah perubahan keadaan: dari orang asing menjadi wajah yang dikenal, dari dekat. |
+| 3b | Kisah Cinta *(opsional, hanya bila `kisahCinta` diisi)* | `pan` (babak-babak kisah, judul act sebagai item pertama) | otomatis dari panjang rel | Kiri | Ditambahkan di tiket 04/05. Menyamping terasa seperti menyusuri waktu. Diletakkan setelah Kami supaya urutan family tetap pin → pan → flow. Perasaan: **Tersentuh**. |
 | 4 | Hari H | `flow` + `in`, hitung mundur hidup (buatan sendiri) | alami ±1.2 | Kiri | Informasi praktis harus ringkas. Hitung mundur bukan `count`, karena itu jam yang berdetak, bukan angka yang dihitung naik. |
 | 5 | Kenangan | `pan` (10 foto; judul act sebagai item pertama, catatan penutup sebagai item terakhir) | 2.4 | Judul di item pertama rail | Gerak menyamping terasa seperti berjalan menyusuri ruangan. |
 | 6 | Hadir | `flow` + `in` (RSVP, Buku Tamu, Amplop) | alami ±2.6 | Kolom kiri | Form dan daftar adalah bagian administratif, jadi tidak di-pin. |
@@ -100,11 +102,11 @@ Pengecekan sebelum build:
 
 - [x] Larangan grammar dipatuhi: tidak ada `scrub`, `spotlight`, `magnet`, bar atas, penomoran, maupun `drift` kontinu.
 - [x] Lebih dari empat device family: pin, parallax, flow+in, reveal, pan, kinetic (6).
-- [x] Tidak ada family yang sama berurutan: pin → flow → pin → flow → pan → flow → pin.
+- [x] Tidak ada family yang sama berurutan: pin → flow → pin → flow → pan → flow → pin. Dengan kisah cinta: pin → flow → pin → **pan** → flow → pan → flow → pin, tetap lulus (dua `pan` dipisah Hari H).
 - [x] Paling banyak dua `scrub`: tidak ada sama sekali.
 - [x] Tidak ada dua act bersebelahan dengan perasaan yang sama (lihat BRIEF).
 - [x] Peak punya span terbesar dengan jarak yang jelas: 3.0 lawan 2.4. Sebelum peak ada keheningan (Sampul).
-- [x] Panjang total ±13.3vh, di luar pita 13.6–13.8. Flow alami harus diukur ulang di tiket 15; kalau mendekati pita, pendekkan Kami atau Kenangan.
+- [x] Panjang total ±13.3vh, di luar pita 13.6–13.8. Flow alami harus diukur ulang di tiket 15; kalau mendekati pita, pendekkan Kami atau Kenangan. Kisah cinta (bila diisi) menambah panjang sesuai relnya; tiket 15 mengukur keduanya, dengan dan tanpa kisah.
 
 ## 6. Palet dan tipografi
 
@@ -185,5 +187,13 @@ Periksa kedua lembar sebelum dipakai. Untuk foto baru:
   - Terapkan palet dan Jost.
   - Engine disalin dari folder build ini tanpa diubah.
 - **05–07**: device dan anchor mengikuti tabel score. Media setiap act masuk redup lalu menghangat saat stasiunnya menyala.
+  - **Sudah ada sejak tiket 05** (di `rangka-undangan.tsx`):
+    - `data-menyala` pada act saat progresnya pertama kali ≥ 0.25. Hero memakai `data-menyala-saat-dibuka`.
+    - `data-hangat` pada `.media-redup` saat media itu ≥ 40% terlihat dan stasiunnya sudah menyala.
+    - `data-span-statis` (span saat gerakan dikurangi).
+    - `data-span-otomatis` pada act `pan`: span dihitung dari panjang rel, 1,1 px scroll per 1 px geseran. Kenangan (tiket 07) sebaiknya memakainya juga, karena 2.4 tetap terlalu panjang atau terlalu pendek tergantung lebar layar.
+  - **Kami di ponsel:** dua baris zigzag. Di layar ≥ 3:2, satu baris: potret di dua sisi luar, teks bertemu di tengah. Bingkai potret sudah terlihat dalam keadaan padam sejak panggung masuk, supaya geser masuk tidak kosong.
+  - **Fokus foto:** `Gambar` punya `fokus` opsional untuk titik potong. Placeholder pria memakai `{ x: 1 }` karena tepi kirinya putih.
 - **08–10**: act `flow` biasa, sudah sesuai score (Hadir). Lentera tamu digantung saat RSVP berhasil (bisa disusulkan di tiket 15).
 - **15**: untaian lentera, penutup, ukur panjang total, Step 5 penuh, feel check terhadap BRIEF, lalu tambahkan baris fingerprint.
+  - Juga **lantai yang menghangat** (§3.3): `--terang` = jumlah stasiun ber-`data-menyala` dibagi jumlah stasiun, canvas bertahap dari `#0E0B09` ke `#1A130D`. Dibuat di tiket 15 karena baru bermakna setelah semua stasiun ada; pemicunya (`data-menyala`) sudah ada di `lentera-stasiun.ts`.

@@ -81,6 +81,7 @@ export function Hero({ hero, alt, mempelai, tanggal }: Props) {
       data-sc-act="pin"
       data-sc-span="3"
       data-span-statis="1"
+      data-menyala-saat-dibuka=""
       aria-labelledby="hero-judul"
       style={tata}
     >

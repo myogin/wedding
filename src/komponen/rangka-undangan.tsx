@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, use, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createContext, use, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Gambar } from "@/konten/skema";
 import { LayarLoading } from "./layar-loading";
+import { useMesinScroll } from "./mesin-scroll";
 import { usePemuatanHero } from "./pemuatan-hero";
 
 type KeadaanUndangan = {
@@ -42,45 +43,6 @@ function useWaktuMinimal(durasiMs: number) {
   }, [durasiMs]);
 
   return persen;
-}
-
-const muatEngine = () => import("@/scrollcraft/scrollcraft.js");
-
-/**
- * Memasang engine scroll-craft pada akar saat Undangan dibuka. Sampul adalah gerbang sebelum engine
- * bekerja: tata letak diukur setelah kunci scroll dilepas (scrollbar desktop muncul tanpa event resize),
- * dan device yang terpicu saat tampil tidak berjalan diam-diam di belakang Sampul.
- * Modul engine dimuat dinamis supaya hanya berjalan di browser dan hanya di halaman Undangan.
- */
-function useMesinScroll(akar: RefObject<HTMLElement | null>, terbuka: boolean) {
-  useEffect(() => {
-    // Muat lebih awal, supaya pemasangan saat "Buka Undangan" tidak menunggu jaringan.
-    void muatEngine();
-  }, []);
-
-  useEffect(() => {
-    if (!terbuka) return;
-    let instans: { destroy(): void } | undefined;
-    let batal = false;
-
-    void muatEngine().then(() => {
-      const engine = window.ScrollCraft;
-      const el = akar.current;
-      if (batal || !engine || !el) return;
-      // Dengan gerakan dikurangi, act ber-pin memakai span statisnya: komposisi diam tanpa ruang scroll kosong.
-      if (engine.reduce) {
-        el.querySelectorAll<HTMLElement>("[data-span-statis]").forEach((act) => {
-          act.dataset.scSpan = act.dataset.spanStatis;
-        });
-      }
-      instans = engine.mount(el);
-    });
-
-    return () => {
-      batal = true;
-      instans?.destroy();
-    };
-  }, [akar, terbuka]);
 }
 
 type Props = {

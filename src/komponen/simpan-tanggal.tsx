@@ -11,8 +11,8 @@ type Props = {
 
 /**
  * Tombol "Simpan Tanggal" dengan dua pilihan: Google Calendar dan berkas .ics untuk kalender lain.
- * Pilihannya melayang di atas halaman, bukan menyisip ke alur, karena engine scroll-craft mengukur
- * posisi act ber-pin sekali saja: act flow yang tiba-tiba lebih tinggi menggeser semua act sesudahnya.
+ * Pilihannya melayang di atas halaman, bukan menyisip ke alur, jadi membukanya tidak menggeser isi di
+ * bawahnya, termasuk act ber-pin sesudah Hari H.
  */
 export function SimpanTanggal({ idNamaAcara, tautanGoogleCalendar, tautanIcs }: Props) {
   const [terbuka, setTerbuka] = useState(false);

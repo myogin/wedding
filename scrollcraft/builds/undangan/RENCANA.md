@@ -207,5 +207,10 @@ Periksa kedua lembar sebelum dipakai. Untuk foto baru:
   - Rel yang lebih pendek dari layar ditaruh di tengah (`justify-content: safe center`).
   - Lightbox galeri berada di dalam panggung act `pan`, bukan di act `flow` seperti kalimat spec Modul 4. Ini disengaja: rel tetap markup server, klik ditangkap pembungkus `display: contents`, dan `<dialog>` modal tampil di top layer, jadi posisi dan transform panggung tidak berpengaruh.
 - **08–10**: act `flow` biasa, sudah sesuai score (Hadir). Lentera tamu digantung saat RSVP berhasil (bisa disusulkan di tiket 15).
+- **Sudah ada sejak tiket 08** (Hadir, `id="hadir"`):
+  - `.tombol-utama`: tombol berisi accent untuk "Konfirmasi Kehadiran" (CTA penutup dan navigasi di tiket 15 memakainya juga).
+  - Pola isian form (`.isian`, `.pilihan`) dan label kecil berhuruf kapital yang dipakai bersama hitung mundur.
+  - Penanda RSVP di `localStorage` `undangan:rsvp` = `{ nama, kehadiran }`. Lentera tamu membacanya.
+  - `mesin-scroll.ts` memanggil `layout()` engine setiap kali tinggi akar Undangan berubah, jadi act ber-pin sesudah Hadir (penutup) tetap tepat walau form memanjang atau memendek. Tiket 15 perlu mengujinya lewat pin penutup.
 - **15**: untaian lentera, penutup, ukur panjang total, Step 5 penuh, feel check terhadap BRIEF, lalu tambahkan baris fingerprint.
   - Juga **lantai yang menghangat** (§3.3): `--terang` = jumlah stasiun ber-`data-menyala` dibagi jumlah stasiun, canvas bertahap dari `#0E0B09` ke `#1A130D`. Dibuat di tiket 15 karena baru bermakna setelah semua stasiun ada; pemicunya (`data-menyala`) sudah ada di `lentera-stasiun.ts`.

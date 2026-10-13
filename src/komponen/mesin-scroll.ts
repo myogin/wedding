@@ -35,6 +35,28 @@ function hitungSpanOtomatis(akar: HTMLElement) {
 }
 
 /**
+ * Engine mengukur posisi act hanya saat dipasang, saat lebar layar berubah, dan setelah font siap. Isi act
+ * `flow` yang tingginya berubah setelah itu (form RSVP yang memanjang, pesan galat atau sukses) menggeser
+ * act ber-pin di bawahnya, jadi tata letak diukur ulang setiap kali tinggi akar berubah.
+ * Mengembalikan fungsi pelepas.
+ */
+function pasangUkurUlangTinggi(akar: HTMLElement, instans: InstansScrollCraft): () => void {
+  let tinggi = akar.offsetHeight;
+  let bingkai = 0;
+  const pengamat = new ResizeObserver(() => {
+    if (akar.offsetHeight === tinggi) return;
+    tinggi = akar.offsetHeight;
+    cancelAnimationFrame(bingkai);
+    bingkai = requestAnimationFrame(() => instans.layout());
+  });
+  pengamat.observe(akar);
+  return () => {
+    pengamat.disconnect();
+    cancelAnimationFrame(bingkai);
+  };
+}
+
+/**
  * Memasang engine scroll-craft pada akar saat Undangan dibuka. Sampul adalah gerbang sebelum engine
  * bekerja: tata letak diukur setelah kunci scroll dilepas (scrollbar desktop muncul tanpa event resize),
  * dan device yang terpicu saat tampil tidak berjalan diam-diam di belakang Sampul.
@@ -55,6 +77,7 @@ export function useMesinScroll(akar: RefObject<HTMLElement | null>, terbuka: boo
     let lepasLentera: (() => void) | undefined;
     let lepasFokusRel: (() => void) | undefined;
     let lepasMuatAwal: (() => void) | undefined;
+    let lepasUkurUlang: (() => void) | undefined;
     let pengatur: ReturnType<typeof setTimeout> | undefined;
     let lebarTerakhir = innerWidth;
     let batal = false;
@@ -65,11 +88,13 @@ export function useMesinScroll(akar: RefObject<HTMLElement | null>, terbuka: boo
       if (engine.reduce) pakaiSpanStatis(el);
       else hitungSpanOtomatis(el);
       instans = engine.mount(el);
+      lepasUkurUlang = pasangUkurUlangTinggi(el, instans);
       lepasLentera = pasangLenteraStasiun(el);
       lepasMuatAwal = pasangMuatAwalRel(el);
       if (!engine.reduce) lepasFokusRel = pasangFokusRel(el);
     };
     const lepas = () => {
+      lepasUkurUlang?.();
       lepasLentera?.();
       lepasMuatAwal?.();
       lepasFokusRel?.();

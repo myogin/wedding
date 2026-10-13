@@ -261,33 +261,9 @@ html:has(.undangan:not([data-terbuka])) {
   line-height: 1.6;
 }
 
+/* Tampilannya sama dengan .tombol-utama (bagian umum). */
 .sampul__buka {
   margin-top: 1.75rem;
-  min-height: 3rem;
-  padding: 0 1.75rem;
-  border: 0;
-  border-radius: var(--sc-r-pill);
-  background: var(--sc-accent);
-  color: var(--sc-accent-ink);
-  font: 500 0.875rem/1 var(--sc-font-text);
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: transform 140ms var(--sc-ease-out);
-}
-
-.sampul__buka:active {
-  transform: scale(0.97);
-}
-
-.sampul__buka:focus-visible {
-  outline: 2px solid var(--sc-ink);
-  outline-offset: 3px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sampul__buka:hover {
-    transform: translateY(-1px);
-  }
 }
 
 /* --------------------------------------------------------------------- hero -- */
@@ -654,6 +630,56 @@ html:has(.undangan:not([data-terbuka])) {
   border: 0;
 }
 
+/* Tombol berisi accent. Di dalam Undangan hanya aksi utama "Konfirmasi Kehadiran" yang memakainya;
+   "Buka Undangan" di Sampul (gerbang) berbagi tampilan yang sama. */
+.sampul__buka,
+.tombol-utama {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.75rem;
+  border: 0;
+  border-radius: var(--sc-r-pill);
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+  font: 500 0.875rem/1 var(--sc-font-text);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    transform 140ms var(--sc-ease-out),
+    opacity 200ms var(--sc-ease-out);
+}
+
+.sampul__buka:active,
+.tombol-utama:active {
+  transform: scale(0.97);
+}
+
+.sampul__buka:focus-visible,
+.tombol-utama:focus-visible {
+  outline: 2px solid var(--sc-ink);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sampul__buka:hover,
+  .tombol-utama:enabled:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Label kecil berhuruf kapital: satuan hitung mundur, label ringkasan, dan label isian form. */
+.hitung__satuan,
+.ringkasan__label,
+.isian__label {
+  color: var(--sc-ink-soft);
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 /* Media masuk redup, lalu menghangat saat stasiunnya menyala dan media itu terlihat (RENCANA.md §3).
    Lapisan gelap milik media sendiri, bukan overlay layar penuh. */
 .media-redup {
@@ -1006,13 +1032,6 @@ html:has(.undangan:not([data-terbuka])) {
   font-variant-numeric: lining-nums tabular-nums;
 }
 
-.hitung__satuan {
-  color: var(--sc-ink-soft);
-  font-size: 0.6875rem;
-  line-height: 1.125rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
 
 .hitung__pesan {
   margin: 0;
@@ -1404,6 +1423,353 @@ html:has(.lightbox[open]) {
   right: max(1rem, env(safe-area-inset-right));
 }
 
+/* -------------------------------------------------------------------- hadir -- */
+/* Rata kiri. Ponsel: bertumpuk. Layar lebar: judul dan ringkasan di kolom kiri, form di kolom kanan. */
+.hadir {
+  /* Pesan galat: 9:1 di canvas, tetap hangat dan tidak bersaing dengan accent. */
+  --warna-galat: #f0a08c;
+  display: grid;
+  gap: var(--sc-7);
+  padding: var(--sc-section) 1.5rem;
+}
+
+.hadir__judul {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: var(--sc-t-2xl);
+  line-height: 1.05;
+  letter-spacing: var(--sc-track-snug);
+}
+
+.hadir__pengantar {
+  max-width: 34ch;
+  margin: var(--sc-4) 0 0;
+  color: var(--sc-ink-soft);
+  line-height: 1.6;
+}
+
+/* Ringkasan: tingginya sudah tercadang selama dimuat. Bila gagal dimuat, ruangnya tetap ada tetapi kosong. */
+.ringkasan[data-gagal] {
+  visibility: hidden;
+}
+
+/* Ponsel: satu baris empat angka, supaya form cepat terjangkau. Layar lebar: 2×2 di kolom kiri. */
+.ringkasan__daftar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sc-3);
+  margin: 0;
+}
+
+/* Angka di atas label (urutan DOM tetap dt lalu dd), rata atas walau labelnya terlipat dua baris. */
+.ringkasan__butir {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 0.375rem;
+  padding-top: var(--sc-3);
+  border-top: 1px solid var(--sc-hairline);
+}
+
+
+/* Angka ikut menyala bersama stasiunnya, seperti angka hitung mundur di Hari H. */
+.ringkasan__angka {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-xl);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  opacity: 0.55;
+  transition: opacity 1400ms var(--sc-ease-out);
+}
+
+.hadir[data-menyala] .ringkasan__angka {
+  opacity: 1;
+}
+
+.hadir__rsvp {
+  max-width: 36rem;
+}
+
+.rsvp {
+  display: grid;
+  gap: var(--sc-6);
+}
+
+.isian {
+  display: grid;
+  gap: var(--sc-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* legend tidak ikut gap grid fieldset. */
+legend.isian__label {
+  margin-bottom: var(--sc-2);
+  padding: 0;
+}
+
+.isian__opsional {
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* Garis bawah saja. Ukuran huruf minimal 16px supaya iOS Safari tidak memperbesar halaman saat kolom difokus. */
+.isian__kolom {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.625rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--sc-hairline-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--sc-ink);
+  font-size: max(1rem, var(--sc-t-base));
+  line-height: 1.5;
+}
+
+.isian__kolom:focus-visible {
+  outline: none;
+  border-bottom-color: var(--sc-accent);
+  box-shadow: 0 1px 0 var(--sc-accent);
+}
+
+.isian__kolom[aria-invalid] {
+  border-bottom-color: var(--warna-galat);
+}
+
+/* Chevron digambar dari garis tepi, jadi warnanya ikut tema. */
+.isian__pilih {
+  position: relative;
+}
+
+.isian__pilih::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.375rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid var(--sc-ink-soft);
+  border-bottom: 1.5px solid var(--sc-ink-soft);
+  transform: translateY(-75%) rotate(45deg);
+  pointer-events: none;
+}
+
+.isian__kolom--pilih {
+  padding-right: 2rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.isian__kolom--pilih option {
+  background: var(--sc-surface);
+  color: var(--sc-ink);
+}
+
+.isian__kolom--panjang {
+  min-height: 7.5rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-sm);
+  resize: vertical;
+}
+
+.isian__kolom--panjang:focus-visible {
+  border-color: var(--sc-accent);
+  box-shadow: 0 0 0 1px var(--sc-accent);
+}
+
+.isian__kolom--panjang[aria-invalid] {
+  border-color: var(--warna-galat);
+}
+
+.isian__bawah {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sc-4);
+}
+
+.isian__keterangan,
+.isian__hitung,
+.isian__galat,
+.rsvp__galat-umum {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.isian__keterangan,
+.isian__hitung {
+  color: var(--sc-ink-soft);
+}
+
+.isian__hitung {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.isian__galat,
+.rsvp__galat-umum {
+  color: var(--warna-galat);
+}
+
+.rsvp__galat-umum {
+  font-size: 0.875rem;
+}
+
+/* Hadir/Tidak Hadir dan pilihan Acara: pill bergaris dengan titik yang terisi saat dipilih. */
+.pilihan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc-3);
+}
+
+.pilihan__opsi {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem 0 1rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: transform 140ms var(--sc-ease-out);
+}
+
+.pilihan__opsi::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid var(--sc-ink-soft);
+  border-radius: 50%;
+}
+
+/* Input asli tetap ada (fokus, keyboard, pembaca layar), menutupi pill tanpa terlihat. */
+.pilihan__opsi input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pilihan__opsi:active {
+  transform: scale(0.97);
+}
+
+.pilihan__opsi:has(input:checked) {
+  border-color: var(--sc-ink);
+  background: color-mix(in oklab, var(--sc-ink) 8%, transparent);
+}
+
+/* Titik berisi tinta, bukan accent: isian accent hanya milik aksi utama. */
+.pilihan__opsi:has(input:checked)::before {
+  border-color: var(--sc-ink);
+  background: var(--sc-ink);
+}
+
+.pilihan__opsi:has(input:focus-visible) {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pilihan__opsi:hover {
+    border-color: var(--sc-ink-soft);
+  }
+}
+
+/* Aksi utama "Konfirmasi Kehadiran" (tampilan dasar di bagian umum). Selebar kolom di ponsel. */
+.tombol-utama:disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: progress;
+}
+
+.rsvp__sudah-mengirim {
+  margin: 0 0 var(--sc-6);
+  padding: var(--sc-4) var(--sc-5);
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-sm);
+  color: var(--sc-ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.rsvp-terkirim {
+  display: grid;
+  gap: var(--sc-4);
+  padding: var(--sc-6) var(--sc-5);
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-md);
+  background: var(--sc-surface);
+  box-shadow: var(--sc-edge);
+  animation: muncul 600ms var(--sc-ease-out);
+}
+
+/* Fokus dipindah ke sini supaya pesannya terbaca; pesannya sendiri bukan kontrol. */
+.rsvp-terkirim:focus {
+  outline: none;
+}
+
+.rsvp-terkirim__judul {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-xl);
+  line-height: 1.15;
+}
+
+.rsvp-terkirim__isi {
+  max-width: 40ch;
+  margin: 0;
+  color: var(--sc-ink-soft);
+  line-height: 1.6;
+}
+
+@media (min-width: 600px) {
+  .tombol-utama {
+    justify-self: start;
+  }
+
+  .rsvp-terkirim {
+    padding: var(--sc-7) var(--sc-6);
+  }
+}
+
+@media (min-width: 900px) {
+  .hadir {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(3rem, 7vw, 8rem);
+    align-items: start;
+    padding-inline: var(--tepi-lebar);
+  }
+
+  .hadir__ringkasan {
+    grid-column: 1;
+  }
+
+  .ringkasan__daftar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sc-5) var(--sc-4);
+    max-width: 24rem;
+  }
+
+  .hadir__rsvp {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
 /* --------------------------------------------------------------------- kaki -- */
 .kaki {
   padding: var(--sc-8) 1.5rem max(var(--sc-7), calc(env(safe-area-inset-bottom) + 1.5rem));
@@ -1601,6 +1967,19 @@ html:has(.lightbox[open]) {
 
   .kenangan__tombol img,
   .lightbox__panggung {
+    transition: none;
+  }
+
+  .ringkasan__angka {
+    transition-duration: 200ms;
+  }
+
+  .rsvp-terkirim {
+    animation-duration: 200ms;
+  }
+
+  .pilihan__opsi,
+  .tombol-utama {
     transition: none;
   }
 }
